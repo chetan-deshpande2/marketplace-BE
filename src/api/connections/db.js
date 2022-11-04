@@ -1,11 +1,8 @@
 import mongoose from "mongoose";
 import config from "../config/index";
 import logger from "../middleware/logger";
-
-// mongoose.Promise = require("bluebird");
-// import { logger } from '../middleware/logger'
-
-const db = mongoose.createConnection(config.db.str, config.db.options);
+mongoose.connect(config.db.str, config.db.options);
+const db = mongoose.connection;
 
 db.on("disconnected", () => {
   logger.debug("Mongoose connection disconnected for master DB");
@@ -36,4 +33,5 @@ process.on("SIGINT", () => {
     process.exit(0);
   });
 });
+
 export default db;

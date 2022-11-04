@@ -2,9 +2,8 @@ import express from "express";
 
 const router = express.Router();
 
-import { createCollection, testPinata } from "./nftController";
-
-router.post("/createCollection", createCollection);
-router.get("/testPinata", testPinata);
+router.post("/create", (req, res) => {
+  res.send("create Route");
+});
 
 module.exports = router;

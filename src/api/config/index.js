@@ -4,7 +4,7 @@ config();
 
 module.exports = {
   db: {
-    str: process.env.MONGO_URL,
+    str: "mongodb+srv://chetan:KNvB5Rz7uShdziA6@cluster0.yb0xzst.mongodb.net/?retryWrites=true&w=majority",
     options: {
       auto_reconnect: true,
       poolSize: 200,
