@@ -4,8 +4,7 @@ const app = require("../app");
 const logger = require("../middleware/logger");
 // eslint-disable-next-line import/order
 const debug = require("debug")("application:server");
-// const socketFunc = require("../helperFunction/chatSocketHelper");
-// const { validateSocketToken } = require("../middleware/auth");
+
 /**
  * Normalize a port into a number, string, or false.
  */
@@ -34,7 +33,7 @@ function normalizePort(val) {
  * Get port from environment and store in Express.
  */
 
-const port = normalizePort(process.env.PORT || "3000");
+const port = normalizePort(process.env.PORT || "3002");
 app.set("port", port);
 
 /**

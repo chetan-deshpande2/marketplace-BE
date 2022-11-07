@@ -19,6 +19,14 @@ app.use(function (req, res, next) {
   next();
 });
 app.use(cors({ credentials: true, origin: true }));
+app.use(
+  cors({
+    origin: ["*"],
+    credentials: true,
+    allowedHeaders: "X-Requested-With, Content-Type, Authorization",
+    methods: "GET, POST, PATCH, PUT, POST, DELETE, OPTIONS",
+  })
+);
 
 app.use(logger("dev"));
 app.use(cookieParser());

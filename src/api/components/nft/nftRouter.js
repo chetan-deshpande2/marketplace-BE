@@ -1,9 +1,8 @@
 import express from "express";
+import { create } from "./nftController";
 
 const router = express.Router();
 
-router.post("/create", (req, res) => {
-  res.send("create Route");
-});
+router.post("/create", create);
 
 module.exports = router;

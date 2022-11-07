@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+import db from "../../connections/db";
 
 const nftSchema = mongoose.Schema({
   nHash: {
