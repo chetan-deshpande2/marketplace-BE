@@ -1,10 +1,10 @@
-import "express";
+import express from "express";
+
+import { createOrder } from "./orderController";
 
 const router = express.Router();
 
-router.post("/createOrder", (req, res) => {
-  res.send("createorder");
-});
+router.post("/createOrder", createOrder);
 
 router.put("/updateOrder", (req, res) => {
   res.send("updateOrder");

@@ -180,4 +180,7 @@ module.exports = {
       res.send("error", error);
     }
   },
+  setNFTOrder: async (req, res) => {
+    res.send("set NFT order");
+  },
 };

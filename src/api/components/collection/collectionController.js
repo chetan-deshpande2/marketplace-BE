@@ -6,10 +6,10 @@ import pinataSDK from "@pinata/sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
 import "dotenv/config";
+import uuid from "uuid";
 import logger from "../../middleware/logger";
 
 import Collection from "./collectionModel";
-import { response } from "express";
 
 // Set S3 endpoint to DigitalOcean Spaces
 const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
@@ -24,7 +24,7 @@ const storage = multerS3({
   bucket: "staging-decrypt-nft-io",
   acl: "public-read",
   contentType: multerS3.AUTO_CONTENT_TYPE,
-  key: (request, file, cb) => {
+  key: function (request, file, cb) {
     cb(null, file.originalname);
   },
 });
@@ -47,14 +47,26 @@ let fileFilter = function (req, file, cb) {
 };
 
 let oMulterObj = {
-  storage: storage,
+  storage: storage1,
   limits: {
     fileSize: 15 * 1024 * 1024, // 15mb
   },
   fileFilter: fileFilter,
 };
 
-const upload = multer(oMulterObj).single("nftFile");
+const storage1 = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    const { originalname } = file;
+
+    cb(null, `${uuid()}-${originalname}`);
+  },
+});
+
+const upload = multer(oMulterObj);
+const uploadBanner = multer(oMulterObj);
 
 const pinata = new pinataSDK({
   pinataApiKey: "3ea7991864f4a7d2f998",
@@ -74,7 +86,16 @@ module.exports = {
     try {
       allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
       errAllowed = "JPG, JPEG, PNG,GIF";
-      upload(req, res, async () => {
+
+      uploadBanner.single("nftFile")(req, res, (error) => {
+        if (error) {
+          res.send(error);
+        } else {
+          let filename = req.file.originalname;
+          console.log(req.file.originalname);
+          res.send(filename);
+        }
+
         const oOptions = {
           pinataMetadata: {
             name: req.file.originalname,
@@ -85,9 +106,10 @@ module.exports = {
         };
         const pathString = "/tmp/";
         const file = fs.createWriteStream(pathString + req.file.originalname);
-        console.log(file);
-        const request = http.get(`${req.file.location}`, (response) => {
+
+        const request = http.get("http://localhost:3000/", (response) => {
           var stream = response.pipe(file);
+          console.log(stream);
           const readableStreamForFile = fs.createReadStream(
             pathString + req.file.originalname
           );
@@ -105,7 +127,7 @@ module.exports = {
                   sContractAddress: req.body.sContractAddress,
                   sRoyaltyPercentage: req.body.sRoyaltyPercentage,
                   oCreatedBy: req.userId,
-                  nextId: 0,
+                  nextId: 2,
                   collectionImage: req.file.location,
                 });
                 collection.save().then((result) => {

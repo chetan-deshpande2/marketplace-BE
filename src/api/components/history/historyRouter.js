@@ -1,12 +1,9 @@
 import express from "express";
+import { insertHistory, fetchHistory } from "./historyController";
 
 const router = express.Router();
 
-router.post("/insert", (req, res) => {
-  res.send("Insert History");
-});
-router.get("/fetchHistory", (req, res) => {
-  res.send("getHistory");
-});
+router.post("/insert", insertHistory);
+router.get("/fetchHistory", fetchHistory);
 
 module.exports = router;
