@@ -1,5 +1,6 @@
 const mongoose = require("mongoose");
 import db from "../../connections/db";
+
 const userSchema = mongoose.Schema({
   sWalletAddress: {
     type: String,

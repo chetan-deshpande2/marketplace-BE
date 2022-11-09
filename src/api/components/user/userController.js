@@ -108,7 +108,7 @@ module.exports = {
         if (error) return res.send("bad Request");
         await User.findOne(
           {
-            sUserName: req.boyd.sUsername,
+            sUserName: req.body.sUsername,
           },
           async (err, user) => {
             if (err) return res.send("user not found");

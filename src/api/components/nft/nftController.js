@@ -10,15 +10,13 @@ import NFT from "./nftModel";
 import Collection from "../collection/collectionModel";
 import multerS3 from "multer-s3";
 
-import "dotenv/config";
-
-// Set S3 endpoint to DigitalOcean Spaces
 const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
 const s3 = new aws.S3({
   endpoint: spacesEndpoint,
   accessKeyId: "P2YPJ7LF6WDBJSPFUAYL",
   secretAccessKey: "ELKZoA86+kAtvWVraYx3ZDLi5jswMZuu4Gb3q6Pu9J0",
 });
+
 const storage = multerS3({
   s3: s3,
   bucket: "staging-decrypt-nft-io",
@@ -47,15 +45,26 @@ let fileFilter = function (req, file, cb) {
 };
 
 let oMulterObj = {
-  storage: storage,
+  storage: storage1,
   limits: {
     fileSize: 15 * 1024 * 1024, // 15mb
   },
   fileFilter: fileFilter,
 };
 
-const upload = multer(oMulterObj).single("nftFile");
+const storage1 = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    const { originalname } = file;
 
+    cb(null, `${uuid()}-${originalname}`);
+  },
+});
+
+const upload = multer(oMulterObj);
+const uploadBanner = multer(oMulterObj);
 const pinata = new pinataSDK({
   pinataApiKey: "3ea7991864f4a7d2f998",
   pinataSecretApiKey:
@@ -77,15 +86,15 @@ module.exports = {
       ];
       errAllowed = "JPG, JPEG, PNG, GIF, MP3, WEBP & MPEG";
       let metaData = req.body.metaData;
-      upload(req, res, (error) => {
-        const iOptions = {
-          pinataMetadata: {
-            name: req.file.originalname,
-          },
-          pinataOptions: {
-            cidVersion: 0,
-          },
-        };
+      uploadBanner.single("nftFile")(req, res, (error) => {
+        if (error) {
+          res.send(error);
+        } else {
+          let filename = req.file.originalname;
+          console.log(req.file.originalname);
+          res.send(filename);
+        }
+
         try {
           const pathString = "/tmp/";
           const file = fs.createWriteStream(pathString + req.file.originalname);

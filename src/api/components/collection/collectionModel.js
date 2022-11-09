@@ -9,7 +9,6 @@ const collectionSchema = mongoose.Schema({
   collectionImage: { type: String, require: true },
   sContractAddress: {
     type: String,
-    unique: true,
     require: true,
     lowercase: true,
   },

@@ -5,11 +5,12 @@ import mongoose from "mongoose";
 import pinataSDK from "@pinata/sdk";
 import multer from "multer";
 import multerS3 from "multer-s3";
-import "dotenv/config";
+
 import uuid from "uuid";
 import logger from "../../middleware/logger";
 
 import Collection from "./collectionModel";
+import User from "../user/userModel";
 
 // Set S3 endpoint to DigitalOcean Spaces
 const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
@@ -83,6 +84,8 @@ module.exports = {
     }
   },
   createCollection: async (req, res) => {
+    // if (!req.userId) return res.send("unauthorized");
+    const userId = "636b479b2fe65b13dc53b690";
     try {
       allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
       errAllowed = "JPG, JPEG, PNG,GIF";
@@ -109,16 +112,14 @@ module.exports = {
 
         const request = http.get("http://localhost:3000/", (response) => {
           var stream = response.pipe(file);
-          console.log(stream);
           const readableStreamForFile = fs.createReadStream(
             pathString + req.file.originalname
           );
-
+          console.log("userId", req.userId);
           stream.on("finish", async () => {
             pinata
               .pinFileToIPFS(readableStreamForFile, oOptions)
               .then(async (file2) => {
-                console.log(file2.IpfsHash);
                 const collection = new Collection({
                   sHash: file2.IpfsHash,
                   sName: req.body.sName,
@@ -126,8 +127,8 @@ module.exports = {
                   erc721: req.body.erc721,
                   sContractAddress: req.body.sContractAddress,
                   sRoyaltyPercentage: req.body.sRoyaltyPercentage,
-                  oCreatedBy: req.userId,
-                  nextId: 2,
+                  oCreatedBy: userId,
+                  nextId: 0,
                   collectionImage: req.file.location,
                 });
                 collection.save().then((result) => {

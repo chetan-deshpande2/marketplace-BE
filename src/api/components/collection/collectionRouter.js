@@ -11,10 +11,10 @@ import NFTmiddleware from "../../middleware/middleware";
 
 router.post(
   "/createCollection",
-  NFTmiddleware.verifyWithoutToken,
+  NFTmiddleware.proceedWithoutToken,
   createCollection
 );
-router.get("/collectionList", collectionList);
+router.get("/collectionList", NFTmiddleware.verifyWithoutToken, collectionList);
 router.post("/upload", NFTmiddleware.verifyWithoutToken, uploadCollection);
 
 module.exports = router;
