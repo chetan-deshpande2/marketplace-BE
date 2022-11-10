@@ -125,5 +125,79 @@ module.exports = {
       res.send(error);
     }
   },
-  addCollabrator: async (req, res) => {},
+  addCollaborator: async (req, res) => {
+    try {
+      if (!req.userId) return res.send("unauthorized user");
+      if (!req.body) return res.send("Collaborator Details Not Found");
+
+      // req.body.sAddress = _.toChecksumAddress(req.body.sAddress);
+
+      User.findById(req.userId, (err, user) => {
+        if (err) return res.send("Server Error");
+        if (!user) return res.send("User Not Found");
+
+        if (user.sWalletAddress == req.body.sAddress)
+          return res.send("You Can't Add Yourself As a Collaborator");
+
+        let aUserCollaborators = user.aCollaborators;
+        let bAlreadyExists;
+        aUserCollaborators.forEach((oCollaborator) => {
+          if (oCollaborator.sAddress == req.body.sAddress)
+            bAlreadyExists = true;
+        });
+
+        if (bAlreadyExists) return res.send("Collaborator Already Exist");
+
+        oCollaboratorDetails = {
+          $push: {
+            aCollaborators: [req.body],
+          },
+        };
+        User.findByIdAndUpdate(
+          req.userId,
+          oCollaboratorDetails,
+          (err, user) => {
+            if (err) return res.send("Server Error");
+            if (!user) return res.send("User Not Found");
+
+            return res.send("Collaborator Added");
+          }
+        );
+      });
+    } catch (error) {
+      return res.send(error);
+    }
+  },
+  collaboratorList: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  getCollaboratorList: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  deleteCollaborator: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  getAllUserDetails: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  getUserWithNfts: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  getUserProfilewithNfts: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  editCollaborator: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
+  getCollaboratorName: async (req, res) => {
+    try {
+    } catch (error) {}
+  },
 };

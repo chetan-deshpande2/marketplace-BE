@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 import db from "../../connections/db";
 const collectionSchema = mongoose.Schema({
   sHash: {

@@ -1,22 +1,22 @@
 import express from "express";
 
-import { createOrder } from "./orderController";
+import {
+  createOrder,
+  updateOrder,
+  deleteOrder,
+  getOrder,
+  getOrdersByNftId,
+} from "./orderController";
 
 const router = express.Router();
 
 router.post("/createOrder", createOrder);
 
-router.put("/updateOrder", (req, res) => {
-  res.send("updateOrder");
-});
+router.put("/updateOrder", updateOrder);
 
-router.delete("/deleteOrder", (req, res) => {
-  res.send("delete");
-});
+router.delete("/deleteOrder", deleteOrder);
 
-router.post("/getOrder", (req, res) => {
-  res.send("getOrder");
-});
-router.post("/getOrdersByNftId", (req, res) => {
-  res.send("getOrdersByNftId");
-});
+router.post("/getOrder", getOrder);
+router.post("/getOrdersByNftId", getOrdersByNftId);
+
+module.exports = router;

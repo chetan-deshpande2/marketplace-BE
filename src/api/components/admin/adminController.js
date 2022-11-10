@@ -1,7 +1,6 @@
-const fs = require("fs");
-const cloudinary = require("cloudinary").v2;
-const multer = require("multer");
-
+import fs from "fs";
+import multer from "multer";
+import cloudinary from "cloudinary";
 import User from "../user/userModel";
 import NFT from "../nft/nftModel";
 
