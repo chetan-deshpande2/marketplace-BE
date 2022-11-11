@@ -12,7 +12,7 @@ import adminRouter from "./admin/adminRouter";
 import authRouter from "./auth/authRouter";
 
 router.use("/nft", nftRouter);
-// router.use("/collection", collectionRouter);
+router.use("/collection", collectionRouter);
 router.use("/bid", bidRouter);
 router.use("/order", orderRouter);
 router.use("/history", historyRouter);

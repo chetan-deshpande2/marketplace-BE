@@ -77,4 +77,31 @@ module.exports = {
       res.send(error);
     }
   },
+  checkUserAddress: async (req, res) => {
+    try {
+      if (!req.body.walletAddress)
+        return res.reply(messages.required_field("Wallet Address"));
+      // if (!validators.isValidWalletAddress(req.body.walletAddress))
+      //   return res.reply(messages.invalid("Wallet Address"));
+
+      User.findOne(
+        {
+          walletAddress: _.toChecksumAddress(req.body.walletAddress),
+        },
+        (err, user) => {
+          if (err) return res.reply(messages.error());
+          if (!user)
+            return res.send("User Not Found", {
+              user: true,
+            });
+          return res.send("User Found", {
+            user: true,
+            status: user.status,
+          });
+        }
+      );
+    } catch (error) {
+      return res.send(error);
+    }
+  },
 };
