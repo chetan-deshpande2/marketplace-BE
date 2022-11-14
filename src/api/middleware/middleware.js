@@ -9,7 +9,7 @@ middleware.verifyToken = (req, res, next) => {
       return res.reply(messages.unauthorized());
     }
     token = token.replace("Bearer ", "");
-    jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+    jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
       if (err) return res.reply(messages.unauthorized());
 
       if (decoded.sRole === "user") {

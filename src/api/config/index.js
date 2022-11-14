@@ -1,10 +1,9 @@
-import { config } from "dotenv";
-
-config();
+import dontenv from "dotenv";
+dontenv.config();
 
 module.exports = {
   db: {
-    str: "mongodb+srv://chetan:KNvB5Rz7uShdziA6@cluster0.yb0xzst.mongodb.net/?retryWrites=true&w=majority",
+    str: process.env.MONGODB_URL,
     options: {
       auto_reconnect: true,
       poolSize: 200,

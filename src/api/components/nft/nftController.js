@@ -415,7 +415,7 @@ module.exports = {
           : [];
       if (token) {
         token = token.replace("Bearer ", "");
-        jwt.verify(token, process.env.JWT_SECRET, function (err, decoded) {
+        jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
           if (decoded) req.userId = decoded.id;
         });
         if (aNFT.oCurrentOwner._id != req.userId)

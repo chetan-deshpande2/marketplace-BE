@@ -1,7 +1,10 @@
+import dotenv from "dotenv";
+
 import User from "./../user/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+dotenv.config();
 
 const saltRounds = 10;
 
@@ -11,7 +14,7 @@ let signJWT = function (user) {
       id: user._id,
       sRole: user.sRole,
     },
-    process.env.JWT_SECRET,
+    process.env.JWT_SECRET_KEY,
     {
       expiresIn: "1d",
     }
@@ -34,7 +37,7 @@ module.exports = {
           req.session["_id"] = user._id;
           req.session["sWalletAddress"] = user.sWalletAddress;
           return res
-            .send("User Created", {
+            .send({
               auth: true,
               token,
               sWalletAddress: user.sWalletAddress,
@@ -51,7 +54,7 @@ module.exports = {
       if (!req.body.sWalletAddress) return res.send("require wallet Address");
       User.findOne(
         {
-          sWalletAddress: _.toChecksumAddress(req.body.sWalletAddress),
+          sWalletAddress: req.body.sWalletAddress,
         },
         (err, user) => {
           if (err) return res.send(err);
@@ -61,7 +64,7 @@ module.exports = {
             req.session["_id"] = user._id;
             req.session["sWalletAddress"] = user.sWalletAddress;
             req.session["sUsername"] = user.sUsername;
-            return res.send("User Login ", {
+            return res.send({
               auth: true,
               token,
               sWalletAddress: user.sWalletAddress,
@@ -79,22 +82,22 @@ module.exports = {
   },
   checkUserAddress: async (req, res) => {
     try {
-      if (!req.body.walletAddress)
-        return res.reply(messages.required_field("Wallet Address"));
+      if (!req.body.walletAddress) return res.send("Wallet Address");
       // if (!validators.isValidWalletAddress(req.body.walletAddress))
       //   return res.reply(messages.invalid("Wallet Address"));
 
       User.findOne(
         {
-          walletAddress: _.toChecksumAddress(req.body.walletAddress),
+          walletAddress: req.body.sWalletAddress,
+          // walletAddress: _.toChecksumAddress(req.body.walletAddress),
         },
         (err, user) => {
-          if (err) return res.reply(messages.error());
+          if (err) return res.send(err);
           if (!user)
-            return res.send("User Not Found", {
+            return res.status(400).send({
               user: true,
             });
-          return res.send("User Found", {
+          return res.status(302).send({
             user: true,
             status: user.status,
           });
@@ -103,5 +106,9 @@ module.exports = {
     } catch (error) {
       return res.send(error);
     }
+  },
+  Logout: async (req, res) => {
+    try {
+    } catch (error) {}
   },
 };
