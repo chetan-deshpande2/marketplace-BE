@@ -4,8 +4,8 @@ import NFTmiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/register", NFTmiddleware.proceedWithoutToken, register);
-router.post("/login", NFTmiddleware.proceedWithoutToken, login);
+router.post("/register", register);
+router.post("/login", login);
 router.post("/logout", NFTmiddleware.proceedWithoutToken, (req, res) => {
   res.send("Logout");
 });

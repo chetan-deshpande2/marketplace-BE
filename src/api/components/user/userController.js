@@ -92,7 +92,7 @@ module.exports = {
         (err, user) => {
           if (err) return res.send("server Error");
           if (!user) return res.send("user not found");
-          return res.send("User Details", user);
+          return res.send(user);
         }
       );
     } catch (error) {

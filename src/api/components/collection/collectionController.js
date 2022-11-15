@@ -61,7 +61,7 @@ const storage1 = multer.diskStorage({
   filename: (req, file, cb) => {
     const { originalname } = file;
 
-    cb(null, `${uuid()}-${originalname}`);
+    cb(null, `${originalname}`);
   },
 });
 
@@ -84,17 +84,17 @@ module.exports = {
   },
   createCollection: async (req, res) => {
     // if (!req.userId) return res.send("unauthorized");
-    const userId = "636b479b2fe65b13dc53b690";
+    // const userId = "63737df86c3f990840e14a67";
     try {
       allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
       errAllowed = "JPG, JPEG, PNG,GIF";
 
       uploadBanner.single("nftFile")(req, res, (error) => {
         if (error) {
+          fs.unlinkSync(req.file.path);
           res.send(error);
         } else {
           let filename = req.file.originalname;
-          console.log(req.file.originalname);
           res.send(filename);
         }
 
@@ -126,23 +126,20 @@ module.exports = {
                   erc721: req.body.erc721,
                   sContractAddress: req.body.sContractAddress,
                   sRoyaltyPercentage: req.body.sRoyaltyPercentage,
-                  oCreatedBy: userId,
+                  oCreatedBy: req.userId,
                   nextId: 0,
                   collectionImage: req.file.location,
                 });
                 collection.save().then((result) => {
-                  console.log(result);
-                  return result;
+                  console.log({ message: "Collection Created ", result });
+                  return;
                 });
-              })
-              .catch((error) => {
-                res.status(401).send("Collection Already exists");
               });
           });
         });
       });
     } catch (error) {
-      res.status(401).send(error);
+      return res.error("error ");
     }
   },
 
@@ -181,18 +178,18 @@ module.exports = {
         },
         {
           $lookup: {
-            from: "users",
+            from: "user",
             localField: "oCreatedBy",
             foreignField: "_id",
             as: "oUser",
           },
         },
-        {
-          $skip: (page - 1) * limit,
-        },
-        {
-          $limit: limit,
-        },
+        // {
+        //   $skip: (page - 1) * limit,
+        // },
+        // {
+        //   $limit: limit,
+        // },
         {
           $sort: {
             sCreated: -1,
@@ -207,9 +204,9 @@ module.exports = {
       results.count = await Collection.countDocuments({
         oCreatedBy: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
       }).exec();
-      return res.send("Collection Request", results);
+      return res.send(results);
     } catch (error) {
-      res.send(error);
+      return res.send(error);
     }
   },
   getCollectionDetails: async (req, res) => {

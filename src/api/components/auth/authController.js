@@ -34,19 +34,18 @@ module.exports = {
         user.save().then((err, result) => {
           let token = signJWT(user);
           console.log(token);
-          req.session["_id"] = user._id;
-          req.session["sWalletAddress"] = user.sWalletAddress;
-          return res
-            .send({
-              auth: true,
-              token,
-              sWalletAddress: user.sWalletAddress,
-            })
-            .catch(res.send("user Already exits"));
+          // req.session["_id"] = user._id;
+          // req.session["sWalletAddress"] = user.sWalletAddress;
+          return res.send({
+            message: "user Details",
+            auth: true,
+            token,
+            sWalletAddress: user.sWalletAddress,
+          });
         });
       });
     } catch (error) {
-      res.send(error);
+      return res.send("error ");
     }
   },
   login: async (req, res) => {
@@ -61,9 +60,9 @@ module.exports = {
           if (!user) return res.send("user not found");
           if (user && user.sRole == "user") {
             let token = signJWT(user);
-            req.session["_id"] = user._id;
-            req.session["sWalletAddress"] = user.sWalletAddress;
-            req.session["sUsername"] = user.sUsername;
+            // req.session["_id"] = user._id;
+            // req.session["sWalletAddress"] = user.sWalletAddress;
+            // req.session["sUsername"] = user.sUsername;
             return res.send({
               auth: true,
               token,
@@ -82,24 +81,23 @@ module.exports = {
   },
   checkUserAddress: async (req, res) => {
     try {
-      if (!req.body.walletAddress) return res.send("Wallet Address");
-      // if (!validators.isValidWalletAddress(req.body.walletAddress))
-      //   return res.reply(messages.invalid("Wallet Address"));
+      if (!req.body.sWalletAddress) return res.send("Wallet Address");
 
       User.findOne(
         {
-          walletAddress: req.body.sWalletAddress,
-          // walletAddress: _.toChecksumAddress(req.body.walletAddress),
+          sWalletAddress: req.body.sWalletAddress,
         },
         (err, user) => {
           if (err) return res.send(err);
           if (!user)
-            return res.status(400).send({
+            return res.send({
+              message: "User Not Found",
               user: true,
             });
-          return res.status(302).send({
+          return res.send({
+            message: "User Found",
             user: true,
-            status: user.status,
+            sStatus: user.sStatus,
           });
         }
       );

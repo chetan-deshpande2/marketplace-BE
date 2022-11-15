@@ -17,12 +17,8 @@ import {
 } from "./collectionController";
 import NFTmiddleware from "../../middleware/middleware";
 
-router.post(
-  "/createCollection",
-  NFTmiddleware.proceedWithoutToken,
-  createCollection
-);
-router.get("/collectionList", NFTmiddleware.verifyWithoutToken, collectionList);
+router.post("/createCollection", NFTmiddleware.verifyToken, createCollection);
+router.get("/collectionList", NFTmiddleware.verifyToken, collectionList);
 router.post("/upload", NFTmiddleware.verifyWithoutToken, uploadCollection);
 
 router.post(
@@ -38,7 +34,7 @@ router.post(
 );
 router.post("/myCollectionList", NFTmiddleware.verifyToken, userCollectionList);
 
-router.get("/getcollections", getCollections);
+router.get("/getcollections", NFTmiddleware.verifyToken, getCollections);
 
 router.post("/getCollectionNFT", getCollectionNFT);
 

@@ -6,11 +6,11 @@ middleware.verifyToken = (req, res, next) => {
     // if (!req.session["_id"]) return res.reply(messages.unauthorized());
     var token = req.headers.authorization;
     if (!token) {
-      return res.reply(messages.unauthorized());
+      return res.send("Unauthorized header");
     }
     token = token.replace("Bearer ", "");
     jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
-      if (err) return res.reply(messages.unauthorized());
+      if (err) return res.send("Unauthorized user");
 
       if (decoded.sRole === "user") {
         req.userId = decoded.id;
@@ -18,7 +18,7 @@ middleware.verifyToken = (req, res, next) => {
         req.name = decoded.oName;
         req.email = decoded.sEmail;
         next();
-      } else return res.reply(messages.unauthorized());
+      } else return res.send("Un Authorized");
     });
   } catch (error) {
     return res.reply(messages.server_error());

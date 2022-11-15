@@ -4,7 +4,7 @@ import UserMiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.get("/profile", profile);
+router.get("/profile", UserMiddleware.verifyToken, profile);
 router.post("/updateProfile", updateProfile);
 
 router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
