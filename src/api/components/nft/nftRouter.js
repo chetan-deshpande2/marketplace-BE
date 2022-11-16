@@ -22,8 +22,9 @@ import NFTmiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/create", NFTmiddleware.verifyWithoutToken, create);
-router.post("/myNFTList", myNFTList);
+router.post("/create", create);
+
+router.post("/myNFTList", NFTmiddleware.verifyWithoutToken, myNFTList);
 router.get("/viewnft/:nNFTId", NFTmiddleware.verifyWithoutToken, nftID);
 router.post("/nftListing", NFTmiddleware.verifyWithoutToken, nftListing);
 

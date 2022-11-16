@@ -3,7 +3,6 @@ const middleware = {};
 
 middleware.verifyToken = (req, res, next) => {
   try {
-    // if (!req.session["_id"]) return res.reply(messages.unauthorized());
     var token = req.headers.authorization;
     if (!token) {
       return res.send("Unauthorized header");
@@ -21,7 +20,7 @@ middleware.verifyToken = (req, res, next) => {
       } else return res.send("Un Authorized");
     });
   } catch (error) {
-    return res.reply(messages.server_error());
+    return res.send("server Error");
   }
 };
 

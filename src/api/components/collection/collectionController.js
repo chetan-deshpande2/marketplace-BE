@@ -83,8 +83,7 @@ module.exports = {
     }
   },
   createCollection: async (req, res) => {
-    // if (!req.userId) return res.send("unauthorized");
-    // const userId = "63737df86c3f990840e14a67";
+    console.log(req.userId);
     try {
       allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
       errAllowed = "JPG, JPEG, PNG,GIF";
@@ -145,7 +144,7 @@ module.exports = {
 
   collectionList: async (req, res, next) => {
     try {
-      console.log("Request in Collection", req.body);
+      console.log("Request in Collection", req.userId);
 
       const page = parseInt(req.body.page);
       const limit = parseInt(req.body.limit);
@@ -155,7 +154,7 @@ module.exports = {
       if (
         endIndex <
         (await Collection.countDocuments({
-          oCreatedBy: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
+          oCreatedBy: { $in: [mongoose.Types.ObjectId(req.userId)] },
         }).exec())
       ) {
         results.next = {
@@ -173,7 +172,7 @@ module.exports = {
       let aCollections = await Collection.aggregate([
         {
           $match: {
-            oCreatedBy: mongoose.Types.ObjectId(req.body.userId),
+            oCreatedBy: mongoose.Types.ObjectId(req.userId),
           },
         },
         {
@@ -196,15 +195,17 @@ module.exports = {
           },
         },
       ]);
-      console.log("aCollections", aCollections);
+
       if (!aCollections) {
         return res.send("Collection Not Found");
       }
+      console.log("aCollections", aCollections);
+      console.log("res", results.results);
       results.results = aCollections;
       results.count = await Collection.countDocuments({
         oCreatedBy: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
       }).exec();
-      return res.send(results);
+      return res.send({ message: "Collection Details", results });
     } catch (error) {
       return res.send(error);
     }
@@ -250,6 +251,7 @@ module.exports = {
   userCollectionList: async (req, res) => {
     try {
       if (!req.userId) return res.send("unauthorized");
+      console.log(req.userId);
 
       var nLimit = parseInt(req.body.length);
       var nOffset = parseInt(req.body.start);

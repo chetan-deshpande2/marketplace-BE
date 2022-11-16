@@ -4,6 +4,8 @@ import User from "./../user/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import crypto from "crypto";
+import { response } from "express";
+import { resolveSoa } from "dns";
 dotenv.config();
 
 const saltRounds = 10;
@@ -107,6 +109,21 @@ module.exports = {
   },
   Logout: async (req, res) => {
     try {
-    } catch (error) {}
+      if (!req.userId) return resolveSoa.send("unauthorized");
+      console.log("User Id", req.userId);
+      User.findOne(
+        {
+          _id: req.userId,
+        },
+        (err, user) => {
+          req.session.destroy();
+          if (err) return res.send("server error");
+          if (!user) return res.send("user not found");
+          return res.send({ message: "Logout", auth: false, token: null });
+        }
+      );
+    } catch (error) {
+      res.send(error);
+    }
   },
 };

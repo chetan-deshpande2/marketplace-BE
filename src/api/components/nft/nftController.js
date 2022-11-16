@@ -96,11 +96,19 @@ module.exports = {
           console.log(req.file.originalname);
           res.send(filename);
         }
+        const iOptions = {
+          pinataMetadata: {
+            name: req.file.originalname,
+          },
+          pinataOptions: {
+            cidVersion: 0,
+          },
+        };
 
         try {
           const pathString = "/tmp/";
           const file = fs.createWriteStream(pathString + req.file.originalname);
-          const request = http.get(`${req.file.location}`, (response) => {
+          const request = http.get("http://localhost:3000/", (response) => {
             var stream = response.pipe(file);
             const readableStreamForFile = fs.createReadStream(
               pathString + req.file.originalname
@@ -174,11 +182,11 @@ module.exports = {
                       collection.nextId = nextId;
                       collection.save();
 
-                      return res.reply(messages.created("NFT"), result);
+                      return res.send({ message: "NFT Created", result });
                     })
                     .catch((error) => {
                       console.log("Created NFT error", error);
-                      return res.reply(messages.error());
+                      return res.send({ message: "error", error });
                     });
                 });
             });
