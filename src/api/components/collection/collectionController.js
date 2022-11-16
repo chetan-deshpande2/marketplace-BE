@@ -203,9 +203,9 @@ module.exports = {
       console.log("res", results.results);
       results.results = aCollections;
       results.count = await Collection.countDocuments({
-        oCreatedBy: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
+        oCreatedBy: { $in: [mongoose.Types.ObjectId(req.userId)] },
       }).exec();
-      return res.send({ message: "Collection Details", results });
+      return res.send(results);
     } catch (error) {
       return res.send(error);
     }
@@ -215,7 +215,7 @@ module.exports = {
       Collection.findOne({ _id: req.body.collectionId }, (err, collection) => {
         if (err) return res.send("server error");
         if (!collection) return res.send("Collection Not Found");
-        return res.send("Collection Details", collection);
+        return res.send(collection);
       });
     } catch (error) {
       res.send(error);
