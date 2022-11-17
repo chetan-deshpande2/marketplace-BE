@@ -117,19 +117,19 @@ module.exports = {
               pinata
                 .pinFileToIPFS(readableStreamForFile, iOptions)
                 .then((res) => {
-                  metaData = JSON.parse(req.body.metaData);
+                  // metaData = JSON.parse(req.body.metaData);
                   let uploadingData = {};
                   uploadingData = {
                     description: req.body.description,
                     external_url: "", // This is the URL that will appear below the asset's image on OpenSea and will allow users to leave OpenSea and view the item on your site.
                     image: "https://ipfs.io/ipfs/" + res.IpfsHash,
                     name: req.body.nTitle,
-                    attributes: req.body.metaData,
+                    attributes: "demo",
                   };
                   console.log("uploadingData", uploadingData);
                   const mOptions = {
                     pinataMetadata: {
-                      name: "hello",
+                      name: req.file.originalname,
                     },
                     pinataOptions: {
                       cidVersion: 0,
@@ -140,6 +140,7 @@ module.exports = {
                 })
                 .then(async (file2) => {
                   console.log("file2---", file2);
+                  console.log("file location", req.file.location);
                   console.log("file location", "https://" + req.file.location);
                   const contractAddress = req.body.nCollection;
                   const creatorAddress = req.body.nCreatorAddress;
@@ -152,10 +153,10 @@ module.exports = {
                     nHash: file2.IpfsHash,
                     nOwnedBy: [], //setting ownedby for first time empty
                     nQuantity: req.body.nQuantity,
-                    nCollaborator: req.body.nCollaborator.split(","),
-                    nCollaboratorPercentage: req.body.nCollaboratorPercentage
-                      .split(",")
-                      .map((percentage) => +percentage),
+                    nCollaborator: ["oxooo", "0xsdf"],
+                    nCollaboratorPercentage: [202, 2],
+                    // .split(",")
+                    // .map((percentage) => +percentage),
                     nRoyaltyPercentage: req.body.nRoyaltyPercentage,
                     nDescription: req.body.nDescription,
                     nCreater: req.userId,
@@ -166,7 +167,7 @@ module.exports = {
                     nLazyMintingStatus: req.body.nLazyMintingStatus,
                   });
                   nft.nOwnedBy.push({
-                    address: creatorAddress.toLowerCase(),
+                    address: creatorAddress,
                     quantity: req.body.nQuantity,
                   });
                   nft
@@ -176,17 +177,18 @@ module.exports = {
                       //update the collection and increment the nextId
 
                       const collection = await Collection.findOne({
-                        sContractAddress: contractAddress,
+                        sContractAddress:
+                          "0xeaed815f8165da9768b1bbeb2f1c6bd918a2b8e4",
                       });
                       let nextId = collection.getNextId();
                       collection.nextId = nextId;
                       collection.save();
 
-                      return res.send({ message: "NFT Created", result });
+                      return res.send(result);
                     })
                     .catch((error) => {
                       console.log("Created NFT error", error);
-                      return res.send({ message: "error", error });
+                      return res.send(error);
                     });
                 });
             });
@@ -196,7 +198,7 @@ module.exports = {
         }
       });
     } catch (error) {
-      res.send("error", error);
+      res.send(error);
     }
   },
   setNFTOrder: async (req, res) => {

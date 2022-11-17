@@ -22,7 +22,7 @@ const storage = multerS3({
   bucket: "staging-decrypt-nft-io",
   acl: "public-read",
   contentType: multerS3.AUTO_CONTENT_TYPE,
-  key: (request, file, cb) => {
+  key: function (request, file, cb) {
     cb(null, file.originalname);
   },
 });
@@ -45,14 +45,26 @@ let fileFilter = function (req, file, cb) {
 };
 
 let oMulterObj = {
-  storage: storage,
+  storage: storage1,
   limits: {
     fileSize: 15 * 1024 * 1024, // 15mb
   },
   fileFilter: fileFilter,
 };
 
-const upload = multer(oMulterObj).single("userProfile");
+const storage1 = multer.diskStorage({
+  destination: (req, file, cb) => {
+    cb(null, "uploads");
+  },
+  filename: (req, file, cb) => {
+    const { originalname } = file;
+
+    cb(null, `${originalname}`);
+  },
+});
+
+const upload = multer(oMulterObj);
+const uploadBanner = multer(oMulterObj);
 
 const pinata = new pinataSDK({
   pinataApiKey: "3ea7991864f4a7d2f998",
@@ -92,7 +104,7 @@ module.exports = {
         (err, user) => {
           if (err) return res.send("server Error");
           if (!user) return res.send("user not found");
-          return res.send(user);
+          return res.send({ message: "user found", user });
         }
       );
     } catch (error) {
@@ -102,15 +114,16 @@ module.exports = {
   updateProfile: async (req, res) => {
     try {
       if (!req.userId) return res.send("UnAuthorized");
+      console.log(req.userId);
       // File upload
       let oProfileDetails = {};
-      upload(req, res, async (error) => {
+      uploadBanner("single")(req, res, async (error) => {
         if (error) return res.send("bad Request");
         await User.findOne(
           {
-            sUserName: req.body.sUsername,
+            sUserName: req.userId,
           },
-          async (err, user) => {
+          (err, user) => {
             if (err) return res.send("user not found");
             if (user)
               if (user._id.toString() !== req.userId.toString()) {

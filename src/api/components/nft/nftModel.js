@@ -1,10 +1,10 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 import db from "../../connections/db";
 
 const nftSchema = mongoose.Schema({
   nHash: {
     type: String,
-    require: true,
+    // require: true,
   },
   nCreated: {
     type: Date,
@@ -13,7 +13,7 @@ const nftSchema = mongoose.Schema({
   nCreater: {
     type: mongoose.Schema.ObjectId,
     ref: "User",
-    require: true,
+    // require: true,
   },
   nOrders: [{ type: mongoose.Schema.ObjectId, ref: "Order" }],
   nCollection: String,
@@ -24,7 +24,9 @@ const nftSchema = mongoose.Schema({
   nRoyaltyPercentage: Number,
   nQuantity: Number,
   nView: Number,
-  nNftImage: { type: String, require: true },
+  nNftImage: { type: String,
+     require: true
+     },
   nType: {
     type: Number,
     require: true,
@@ -34,7 +36,7 @@ const nftSchema = mongoose.Schema({
   },
   nTokenID: {
     type: Number,
-    require: true,
+    // require: true,
   },
   nUser_likes: [
     {

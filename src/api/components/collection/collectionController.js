@@ -107,13 +107,11 @@ module.exports = {
         };
         const pathString = "/tmp/";
         const file = fs.createWriteStream(pathString + req.file.originalname);
-
         const request = http.get("http://localhost:3000/", (response) => {
           var stream = response.pipe(file);
           const readableStreamForFile = fs.createReadStream(
             pathString + req.file.originalname
           );
-          console.log("userId", req.userId);
           stream.on("finish", async () => {
             pinata
               .pinFileToIPFS(readableStreamForFile, oOptions)
@@ -200,7 +198,6 @@ module.exports = {
         return res.send("Collection Not Found");
       }
       console.log("aCollections", aCollections);
-      console.log("res", results.results);
       results.results = aCollections;
       results.count = await Collection.countDocuments({
         oCreatedBy: { $in: [mongoose.Types.ObjectId(req.userId)] },
