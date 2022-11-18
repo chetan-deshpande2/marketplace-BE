@@ -23,7 +23,7 @@ const historySchema = new mongoose.Schema({
   },
   sCreated: {
     type: Date,
-    // default: Date.now,
+    default: Date.now,
   },
 });
 

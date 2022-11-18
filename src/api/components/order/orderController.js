@@ -45,8 +45,9 @@ module.exports = {
         oStatus: req.body.status,
         auction_end_date: req.body.auctionEndDate,
       });
-      const result = order.save();
-      res.status(300).send("Order Created", result);
+      const result = order.save().then((results) => {
+        return res.send({ message: "Order Created", results });
+      });
     } catch (error) {
       console.log("Error " + JSON.stringify(error));
       res.send(error);

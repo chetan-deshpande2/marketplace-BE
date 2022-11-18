@@ -13,8 +13,9 @@ module.exports = {
         message: req.body.message,
         sCreated: req.body.created_ts,
       });
-      const result = insertData.save();
-      return res.send("Inserted History ", result);
+      const result = insertData.save().then((results) => {
+        return res.send({ message: "Inserted History ", results });
+      });
     } catch (error) {
       res.send(error);
     }
@@ -95,7 +96,7 @@ module.exports = {
         results.count = await History.countDocuments(SearchObj).exec();
         results.results = data;
         res.header("Access-Control-Max-Age", 600);
-        return res.send("History Details", results);
+        return res.send({ message: "History Details", results });
       }
     } catch (error) {
       res.send(error);

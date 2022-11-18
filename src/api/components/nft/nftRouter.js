@@ -22,7 +22,7 @@ import NFTmiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/create", create);
+router.post("/create", NFTmiddleware.verifyToken, create);
 
 router.post("/myNFTList", NFTmiddleware.verifyWithoutToken, myNFTList);
 router.get("/viewnft/:nNFTId", NFTmiddleware.verifyWithoutToken, nftID);
@@ -42,7 +42,7 @@ router.get("/deleteNFT/:nNFTId", NFTmiddleware.verifyToken, deleteNFT);
 
 router.put("/updateBasePrice", NFTmiddleware.verifyToken, updateBasePrice);
 
-router.put("/setNFTOrder", NFTmiddleware.verifyToken, setNFTOrder);
+router.put("/setNFTOrder", setNFTOrder);
 
 router.post(
   "/getOnSaleItems",

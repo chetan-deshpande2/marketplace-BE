@@ -76,6 +76,7 @@ const pinata = new pinataSDK({
 module.exports = {
   create: async (req, res, next) => {
     try {
+      // if (!req.userId) return res.send("Unauthorized access");
       allowedMimes = [
         "image/jpeg",
         "video/mp4",
@@ -94,115 +95,127 @@ module.exports = {
         } else {
           let filename = req.file.originalname;
           console.log(req.file.originalname);
-          res.send(filename);
-        }
-        const iOptions = {
-          pinataMetadata: {
-            name: req.file.originalname,
-          },
-          pinataOptions: {
-            cidVersion: 0,
-          },
-        };
+          const iOptions = {
+            pinataMetadata: {
+              name: req.file.originalname,
+            },
+            pinataOptions: {
+              cidVersion: 0,
+            },
+          };
 
-        try {
-          const pathString = "/tmp/";
-          const file = fs.createWriteStream(pathString + req.file.originalname);
-          const request = http.get("http://localhost:3000/", (response) => {
-            var stream = response.pipe(file);
-            const readableStreamForFile = fs.createReadStream(
+          try {
+            const pathString = "/tmp/";
+            console.log("fileName", req.file.location);
+            console.log("Original name", req.file.originalname);
+            const file = fs.createWriteStream(
               pathString + req.file.originalname
             );
-            stream.on("finish", async () => {
-              pinata
-                .pinFileToIPFS(readableStreamForFile, iOptions)
-                .then((res) => {
-                  // metaData = JSON.parse(req.body.metaData);
-                  let uploadingData = {};
-                  uploadingData = {
-                    description: req.body.description,
-                    external_url: "", // This is the URL that will appear below the asset's image on OpenSea and will allow users to leave OpenSea and view the item on your site.
-                    image: "https://ipfs.io/ipfs/" + res.IpfsHash,
-                    name: req.body.nTitle,
-                    attributes: "demo",
-                  };
-                  console.log("uploadingData", uploadingData);
-                  const mOptions = {
-                    pinataMetadata: {
-                      name: req.file.originalname,
-                    },
-                    pinataOptions: {
-                      cidVersion: 0,
-                    },
-                  };
-                  console.log("res---", res.IpfsHash);
-                  return pinata.pinJSONToIPFS(uploadingData, mOptions);
-                })
-                .then(async (file2) => {
-                  console.log("file2---", file2);
-                  console.log("file location", req.file.location);
-                  console.log("file location", "https://" + req.file.location);
-                  const contractAddress = req.body.nCollection;
-                  const creatorAddress = req.body.nCreatorAddress;
-                  const nft = new NFT({
-                    nTitle: req.body.nTitle,
-                    nCollection:
-                      req.body.nCollection && req.body.nCollection != undefined
-                        ? req.body.nCollection
-                        : "",
-                    nHash: file2.IpfsHash,
-                    nOwnedBy: [], //setting ownedby for first time empty
-                    nQuantity: req.body.nQuantity,
-                    nCollaborator: ["oxooo", "0xsdf"],
-                    nCollaboratorPercentage: [202, 2],
-                    // .split(",")
-                    // .map((percentage) => +percentage),
-                    nRoyaltyPercentage: req.body.nRoyaltyPercentage,
-                    nDescription: req.body.nDescription,
-                    nCreater: req.userId,
-                    nTokenID: req.body.nTokenID,
-                    nType: req.body.nType,
-                    nLockedContent: req.body.lockedContent,
-                    nNftImage: req.file.location,
-                    nLazyMintingStatus: req.body.nLazyMintingStatus,
-                  });
-                  nft.nOwnedBy.push({
-                    address: creatorAddress,
-                    quantity: req.body.nQuantity,
-                  });
-                  nft
-                    .save()
-                    .then(async (result) => {
+            const request = http.get("http://localhost:3000/", (response) => {
+              var stream = response.pipe(file);
+              const readableStreamForFile = fs.createReadStream(
+                pathString + req.file.originalname
+              );
+              stream.on("finish", async () => {
+                pinata
+                  .pinFileToIPFS(readableStreamForFile, iOptions)
+                  .then((res) => {
+                    // metaData = JSON.parse(req.body.metaData);
+                    let uploadingData = {};
+                    uploadingData = {
+                      description: req.body.description,
+                      external_url: "", // This is the URL that will appear below the asset's image on OpenSea and will allow users to leave OpenSea and view the item on your site.
+                      image: "https://ipfs.io/ipfs/" + res.IpfsHash,
+                      name: req.body.nTitle,
+                      attributes: req.body.metaData,
+                    };
+                    console.log("uploadingData", uploadingData);
+                    const mOptions = {
+                      pinataMetadata: {
+                        name: "hello",
+                      },
+                      pinataOptions: {
+                        cidVersion: 0,
+                      },
+                    };
+                    console.log("res---", res.IpfsHash);
+                    return pinata.pinJSONToIPFS(uploadingData, mOptions);
+                  })
+                  .then(async (file2) => {
+                    console.log("file2---", file2);
+                    console.log(
+                      "file location",
+                      "https://" + req.file.location
+                    );
+                    const contractAddress = req.body.nCollection;
+                    const creatorAddress = req.body.nCreatorAddress;
+                    console.log("Contract Address", contractAddress);
+                    console.log("creator address", creatorAddress);
+                    const nft = new NFT({
+                      nTitle: req.body.nTitle,
+                      nCollection:
+                        req.body.nCollection &&
+                        req.body.nCollection != undefined
+                          ? req.body.nCollection
+                          : "",
+                      nHash: file2.IpfsHash,
+                      nOwnedBy: [], //setting ownedby for first time empty
+                      nQuantity: req.body.nQuantity,
+                      nCollaborator: req.body.nCollaborator.split(","),
+                      nCollaboratorPercentage: req.body.nCollaboratorPercentage
+                        .split(",")
+                        .map((percentage) => +percentage),
+                      nRoyaltyPercentage: req.body.nRoyaltyPercentage,
+                      nDescription: req.body.nDescription,
+                      nCreater: req.userId,
+                      nTokenID: req.body.nTokenID,
+                      nType: req.body.nType,
+                      nLockedContent: req.body.lockedContent,
+                      nNftImage: req.file.location,
+                      nLazyMintingStatus: req.body.nLazyMintingStatus,
+                    });
+                    nft.nOwnedBy.push({
+                      address: creatorAddress,
+                      quantity: req.body.nQuantity,
+                    });
+                    await nft.save().then(async (result) => {
                       //increment collection nextId by 1
                       //update the collection and increment the nextId
 
                       const collection = await Collection.findOne({
-                        sContractAddress:
-                          "0xeaed815f8165da9768b1bbeb2f1c6bd918a2b8e4",
+                        sContractAddress: contractAddress,
                       });
                       let nextId = collection.getNextId();
                       collection.nextId = nextId;
                       collection.save();
-
-                      return res.send(result);
-                    })
-                    .catch((error) => {
-                      console.log("Created NFT error", error);
-                      return res.send(error);
+                      console.log(result);
+                      return res.send({ message: "NFT Data", result });
                     });
-                });
+                  });
+              });
             });
-          });
-        } catch (error) {
-          console.log("error in file upload..", error);
+          } catch (error) {
+            console.log("error in file upload..", error);
+          }
         }
       });
     } catch (error) {
       res.send(error);
     }
   },
+
   setNFTOrder: async (req, res) => {
-    res.send("set NFT order");
+    try {
+      let aNft = await NFT.findById(req.body.nftId);
+      if (!aNft) return res.send("NFT Not found");
+
+      aNft.nOrders.push(req.body.orderId);
+
+      await aNft.save();
+      return res.send(aNft);
+    } catch (error) {
+      res.send(error);
+    }
   },
   myNFTList: async (req, res) => {
     try {

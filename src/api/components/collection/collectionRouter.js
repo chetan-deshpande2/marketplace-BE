@@ -32,7 +32,7 @@ router.post(
   NFTmiddleware.verifyWithoutToken,
   getCollectionDetailsByAddress
 );
-router.post("/myCollectionList", NFTmiddleware.verifyToken, userCollectionList);
+router.get("/myCollectionList", NFTmiddleware.verifyToken, userCollectionList);
 
 router.get("/getcollections", NFTmiddleware.verifyToken, getCollections);
 

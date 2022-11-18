@@ -5,6 +5,7 @@ import {
   fetchBidNft,
   acceptBidNft,
 } from "./bidController";
+import bidMiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 

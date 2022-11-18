@@ -7,10 +7,11 @@ import {
   getOrder,
   getOrdersByNftId,
 } from "./orderController";
+import OrderMiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/createOrder", createOrder);
+router.post("/createOrder", OrderMiddleware.verifyToken, createOrder);
 
 router.put("/updateOrder", updateOrder);
 
