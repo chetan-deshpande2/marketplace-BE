@@ -4,7 +4,7 @@ import historyMiddleware from "../../middleware/middleware";
 
 const router = express.Router();
 
-router.post("/insert", historyMiddleware.verifyToken, insertHistory);
+router.post("/insert", insertHistory);
 router.get("/fetchHistory", historyMiddleware.verifyWithoutToken, fetchHistory);
 
 module.exports = router;

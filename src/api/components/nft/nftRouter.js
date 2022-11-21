@@ -42,7 +42,7 @@ router.get("/deleteNFT/:nNFTId", NFTmiddleware.verifyToken, deleteNFT);
 
 router.put("/updateBasePrice", NFTmiddleware.verifyToken, updateBasePrice);
 
-router.put("/setNFTOrder", setNFTOrder);
+router.put("/setNFTOrder", NFTmiddleware.verifyToken, setNFTOrder);
 
 router.post(
   "/getOnSaleItems",

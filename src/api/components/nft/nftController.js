@@ -382,14 +382,16 @@ module.exports = {
         ]);
         let iFiltered = data[0].nfts.length;
         if (data[0].totalCount[0] == undefined) {
-          return res.send("Data", {
+          return res.send({
+            message: "Data",
             data: 0,
             draw: req.body.draw,
             recordsTotal: 0,
             recordsFiltered: iFiltered,
           });
         } else {
-          return res.send("NFT Details", {
+          return res.send({
+            message: "NFT Details",
             data: data[0].nfts,
             draw: req.body.draw,
             recordsTotal: data[0].totalCount[0].count,
@@ -403,7 +405,7 @@ module.exports = {
   },
   nftID: async (req, res) => {
     try {
-      if (!req.params.nNFTId) return "NFT Id not found";
+      if (!req.params.nNFTId) return res.send("NFT Id not found");
 
       let aNFT = await NFT.findById(req.params.nNFTId).populate({
         path: "nCreater",
@@ -457,7 +459,7 @@ module.exports = {
         }
         console.log("---------------------------10");
 
-        return res.send("NFT", aNFT);
+        return res.send(aNFT);
       }
     } catch (error) {
       res.send(error);
@@ -627,14 +629,16 @@ module.exports = {
       ]);
       let iFiltered = data[0].nfts.length;
       if (data[0].totalCount[0] == undefined) {
-        return res.send("Data", {
+        return res.send({
+          message: "Data",
           data: 0,
           draw: req.body.draw,
           recordsTotal: 0,
           recordsFiltered: iFiltered,
         });
       } else {
-        return res.send("NFT Details", {
+        return res.send({
+          message: "NFT Details",
           data: data[0].nfts,
           draw: req.body.draw,
           recordsTotal: data[0].totalCount[0].count,
@@ -661,14 +665,14 @@ module.exports = {
           { sort: { sCreated: -1 } }
         );
         console.log("nft owner is-->", nftOwner);
-        return res.send("success", nftOwner);
+        return res.send({ message: "success", nftOwner });
       } else {
         if (nftOwner.oCurrentOwner) {
           users = await User.findOne(nftOwner.oCurrentOwner);
           nftOwner.oCurrentOwner = users;
         }
         console.log("nft owner is-->", nftOwner);
-        return res.reply(messages.success(), nftOwner);
+        return res.send({ message: "success", nftOwner });
       }
     } catch (error) {
       res.send(error);
@@ -681,7 +685,7 @@ module.exports = {
       let nftOwner = {};
 
       nftOwner = await NFTowners.find({ nftId: req.params.nNFTId });
-      return res.send("NFT Owner", nftOwner);
+      return res.send({ message: "NFT Owner", nftOwner });
     } catch (error) {
       return res.send(error);
     }
@@ -748,7 +752,7 @@ module.exports = {
       aNft.nOrders.push(req.body.orderId);
       await aNft.save();
 
-      return res.send("nfts List", aNft);
+      return res.send({ message: "nfts List", aNft });
     } catch (error) {
       res.send(error);
     }
@@ -846,7 +850,7 @@ module.exports = {
       results.count = await NFT.countDocuments(NFTSearchObj).exec();
       results.results = data;
       res.header("Access-Control-Max-Age", 600);
-      return res.send("Order List", results);
+      return res.send({ message: "Order List", results });
     } catch (error) {
       res.send(error);
     }
@@ -854,7 +858,7 @@ module.exports = {
   toggleSellingType: async (req, res) => {
     try {
       if (!req.userId) return res.send("unauthrized user");
-      if (!req.body.nNFTId) return res.reply(messages.not_found("NFT ID"));
+      if (!req.body.nNFTId) return res.send("ID Not Found");
       if (!req.body.sSellingType) return res.send("Selling Type Not Found");
 
       let oNFT = await NFT.findById(req.body.nNFTId);
@@ -885,7 +889,7 @@ module.exports = {
           if (err) return res.send("Server Error");
           if (!nft) return res.send("NFT Not Found");
 
-          return res.reply(messages.updated("NFT Details"));
+          return res.send("NFT Details");
         });
       }
     } catch (error) {
@@ -923,7 +927,8 @@ module.exports = {
               .pinFileToIPFS(readableStreamForFile, oOptions)
               .then(async (result) => {
                 fs.unlinkSync(req.file.path);
-                return res.reply(messages.created("Collection"), {
+                return res.send({
+                  message: Collection,
                   track_cover: result.IpfsHash,
                 });
               })
@@ -989,7 +994,7 @@ module.exports = {
       if (!aNft) {
         return res.send("NFT not found");
       }
-      return res.send("NFT List", aNft);
+      return res.send({ message: "NFT List", aNft });
     } catch (error) {
       return res.send(error);
     }
@@ -1166,7 +1171,7 @@ module.exports = {
       }
       results.results = data;
 
-      return res.send("NFTs List", results);
+      return res.send({ message: "NFTs List", results });
     } catch (error) {
       res.send(error);
     }
@@ -1296,7 +1301,7 @@ module.exports = {
       }).exec();
       results.results = data;
 
-      return res.send("NFTs List Liked By User", results);
+      return res.send({ message: "NFTs List Liked By User", results });
     } catch (error) {
       console.log("Error:", error);
       return res.send(error);
@@ -1510,7 +1515,7 @@ module.exports = {
       }).exec();
       results.results = data;
 
-      return res.send("NFTs List", results);
+      return res.send({ message: "NFTs List", results });
     } catch (error) {
       console.log("Error:", error);
       return res.send(error);

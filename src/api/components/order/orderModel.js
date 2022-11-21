@@ -46,4 +46,5 @@ const orderSchema = mongoose.Schema({
   },
   quantity_sold: { type: Number, default: 0 },
 });
+
 export default db.model("Order", orderSchema);
