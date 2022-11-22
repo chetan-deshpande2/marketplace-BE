@@ -8,6 +8,7 @@ import multer from "multer";
 import logger from "../../middleware/logger";
 import NFT from "./nftModel";
 import NFTowners from "./nftOwnerModel";
+import Order from "../order/orderModel";
 
 import Collection from "../collection/collectionModel";
 import multerS3 from "multer-s3";
@@ -776,19 +777,22 @@ module.exports = {
       }
       let OrderSearchObj = Object.assign({}, OrderSearchArray);
       let OrderIdsss = await Order.distinct("oNftId", OrderSearchObj);
+      console.log("Order Ids======", OrderIdsss);
 
       let NFTSearchArray = [];
       NFTSearchArray["_id"] = { $in: OrderIdsss.map(String) };
-      if (sTextsearch !== "") {
-        NFTSearchArray["nTitle"] = {
-          $regex: new RegExp(sTextsearch),
-          $options: "<options>",
-        };
-      }
+      console.log("NFTSearchArray Array======", NFTSearchArray);
+      // if (sTextsearch !== "") {
+      //   NFTSearchArray["nTitle"] = {
+      //     $regex: new RegExp(sTextsearch),
+      //     $options: "<options>",
+      //   };
+      // }
       if (itemType !== "") {
         NFTSearchArray["nType"] = itemType;
       }
       let NFTSearchObj = Object.assign({}, NFTSearchArray);
+      console.log("NFT OBj Search========", NFTSearchObj);
       const results = {};
       if (endIndex < (await NFT.countDocuments(NFTSearchObj).exec())) {
         results.next = {
@@ -796,12 +800,12 @@ module.exports = {
           limit: limit,
         };
       }
-      if (startIndex > 0) {
-        results.previous = {
-          page: page - 1,
-          limit: limit,
-        };
-      }
+      // if (startIndex > 0) {
+      //   results.previous = {
+      //     page: page - 1,
+      //     limit: limit,
+      //   };
+      // }
       await NFT.find(NFTSearchObj)
         .sort({ nCreated: -1 })
         .select({
@@ -1519,6 +1523,19 @@ module.exports = {
     } catch (error) {
       console.log("Error:", error);
       return res.send(error);
+    }
+  },
+  updateNFTDeatils: async (req, res) => {
+    try {
+      console.log(req.body);
+      if (!req.body.nftId) return res.send("NFT Not Found");
+      await NFT.findByIdAndUpdate(req.body.nftId, { nTitle: "Test1" }).then(
+        (results) => {
+          res.send(results);
+        }
+      );
+    } catch (error) {
+      res.send(error);
     }
   },
 };

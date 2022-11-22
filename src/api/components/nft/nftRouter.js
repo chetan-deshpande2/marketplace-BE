@@ -17,6 +17,7 @@ import {
   getUserOnSaleNfts,
   transferNfts,
   getSearchedNft,
+  updateNFTDeatils,
 } from "./nftController";
 import NFTmiddleware from "../../middleware/middleware";
 
@@ -43,6 +44,7 @@ router.get("/deleteNFT/:nNFTId", NFTmiddleware.verifyToken, deleteNFT);
 router.put("/updateBasePrice", NFTmiddleware.verifyToken, updateBasePrice);
 
 router.put("/setNFTOrder", NFTmiddleware.verifyToken, setNFTOrder);
+router.post("/updateNFTDeatils", updateNFTDeatils);
 
 router.post(
   "/getOnSaleItems",

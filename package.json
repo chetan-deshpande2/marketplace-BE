@@ -4,7 +4,8 @@
   "description": "",
   "main": "app.js",
   "scripts": {
-    "start": "npm run build && npm run pm2:start && npm run pm2:start-cron",
+    "start": "node ./src/api/bin/www --exec babel-node --presets @babel/preset-env",
+    "start:dev": "npm run build && npm run pm2:start && npm run pm2:start-cron",
     "start_bkp": "npm run build && node lib/api/bin/www --exec babel-node",
     "build": "npm run remove && babel ./src --out-dir lib --copy-files",
     "build-prod": "npm run build && babel ./lib -d dist --copy-files",
