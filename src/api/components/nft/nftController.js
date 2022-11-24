@@ -405,6 +405,7 @@ module.exports = {
     }
   },
   nftID: async (req, res) => {
+    console.log(req.params.nNFTId);
     try {
       if (!req.params.nNFTId) return res.send("NFT Id not found");
 
@@ -421,13 +422,13 @@ module.exports = {
       });
       if (!aNFT) return res.send("NFT Not Found");
       aNFT = aNFT.toObject();
+      console.log(aNFT);
       aNFT.sCollectionDetail = {};
+
       aNFT.sCollectionDetail = await Collection.findOne({
-        sName:
-          aNFT.sCollection && aNFT.sCollection != undefined
-            ? aNFT.sCollection
-            : "-",
+        sName: aNFT.nCollection != undefined ? aNFT.nCollection : "-",
       });
+      console.log(aNFT.sCollectionDetail);
       var token = req.headers.authorization;
 
       req.userId =
@@ -435,10 +436,6 @@ module.exports = {
           ? req.userId
           : "";
 
-      let likeARY =
-        aNFT.user_likes && aNFT.user_likes.length
-          ? aNFT.user_likes.filter((v) => v.toString() == req.userId.toString())
-          : [];
       if (token) {
         token = token.replace("Bearer ", "");
         jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
@@ -466,6 +463,7 @@ module.exports = {
       res.send(error);
     }
   },
+
   nftListing: async (req, res) => {
     try {
       if (!req.userId) return res.send("unauthroized");
@@ -761,12 +759,20 @@ module.exports = {
   getOnSaleItems: async (req, res) => {
     try {
       let data = [];
+      console.log("data===>", data);
       let OrderSearchArray = [];
       let sSellingType = req.body.sSellingType;
       let sTextsearch = req.body.sTextsearch;
       let itemType = req.body.itemType;
       const page = parseInt(req.body.page);
       const limit = parseInt(req.body.limit);
+      console.log(
+        "reciving payload===========>",
+        sSellingType,
+        itemType,
+        page,
+        limit
+      );
 
       const startIndex = (page - 1) * limit;
       const endIndex = page * limit;
@@ -782,12 +788,12 @@ module.exports = {
       let NFTSearchArray = [];
       NFTSearchArray["_id"] = { $in: OrderIdsss.map(String) };
       console.log("NFTSearchArray Array======", NFTSearchArray);
-      // if (sTextsearch !== "") {
-      //   NFTSearchArray["nTitle"] = {
-      //     $regex: new RegExp(sTextsearch),
-      //     $options: "<options>",
-      //   };
-      // }
+      if (sTextsearch !== "") {
+        NFTSearchArray["nTitle"] = {
+          $regex: new RegExp(sTextsearch),
+          $options: "<options>",
+        };
+      }
       if (itemType !== "") {
         NFTSearchArray["nType"] = itemType;
       }
@@ -800,12 +806,12 @@ module.exports = {
           limit: limit,
         };
       }
-      // if (startIndex > 0) {
-      //   results.previous = {
-      //     page: page - 1,
-      //     limit: limit,
-      //   };
-      // }
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit: limit,
+        };
+      }
       await NFT.find(NFTSearchObj)
         .sort({ nCreated: -1 })
         .select({
@@ -852,7 +858,7 @@ module.exports = {
           console.log("Error", e);
         });
       results.count = await NFT.countDocuments(NFTSearchObj).exec();
-      results.results = data;
+      results.results = data[0];
       res.header("Access-Control-Max-Age", 600);
       return res.send({ message: "Order List", results });
     } catch (error) {

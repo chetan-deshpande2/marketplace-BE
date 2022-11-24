@@ -13,9 +13,9 @@ const router = express.Router();
 
 router.post("/createOrder", OrderMiddleware.verifyToken, createOrder);
 
-router.put("/updateOrder", updateOrder);
+router.put("/updateOrder", OrderMiddleware.verifyToken, updateOrder);
 
-router.delete("/deleteOrder", deleteOrder);
+router.delete("/deleteOrder", OrderMiddleware.verifyToken, deleteOrder);
 
 router.post("/getOrder", getOrder);
 router.post("/getOrdersByNftId", getOrdersByNftId);

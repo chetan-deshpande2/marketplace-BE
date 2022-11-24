@@ -207,12 +207,13 @@ module.exports = {
       res.send(error);
     }
   },
+
   getOrder: async (req, res) => {
     try {
       Order.findOne({ _id: req.body.orderId }, (err, order) => {
         if (err) return res.send("Server Error");
         if (!order) return res.send("Order Not Found");
-        return res.send("Order Details", order);
+        return res.send({ message: "Order Details", order });
       });
     } catch (error) {
       res.status(401).send(error);
@@ -220,13 +221,14 @@ module.exports = {
   },
   getOrdersByNftId: async (req, res) => {
     try {
-      const sortKey = req.body.sortKey ? req.body.sortKey : oPrice;
-      //sortType will let you choose from ASC 1 or DESC -1
-      const sortType = req.body.sortType ? req.body.sortType : -1;
-      var sortObject = {};
-      var stype = sortKey;
-      var sdir = sortType;
-      sortObject[stype] = sdir;
+      console.log(req.body.nftId);
+      // const sortKey = req.body.sortKey ? req.body.sortKey : oPrice;
+      // //sortType will let you choose from ASC 1 or DESC -1
+      // const sortType = req.body.sortType ? req.body.sortType : -1;
+      // var sortObject = {};
+      // var stype = sortKey;
+      // var sdir = sortType;
+      // sortObject[stype] = sdir;
 
       const page = parseInt(req.body.page);
       const limit = parseInt(req.body.limit);
@@ -255,13 +257,14 @@ module.exports = {
         oNftId: req.body.nftId,
         oStatus: 1,
       })
-        .sort(sortObject)
+        // .sort(sortObject)
         .limit(limit)
         .skip(startIndex)
         .exec();
 
       results.results = AllOrders;
-      return res.send("NFT Order List", results);
+      console.log(AllOrders);
+      return res.send({ message: "NFT Order List", AllOrders });
     } catch (error) {
       res.status(401).send(error);
     }

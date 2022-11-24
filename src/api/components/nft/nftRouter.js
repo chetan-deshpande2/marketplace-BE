@@ -26,7 +26,7 @@ const router = express.Router();
 router.post("/create", NFTmiddleware.verifyToken, create);
 
 router.post("/myNFTList", NFTmiddleware.verifyWithoutToken, myNFTList);
-router.get("/viewnft/:nNFTId", NFTmiddleware.verifyWithoutToken, nftID);
+router.get("/viewnft/:nNFTId", nftID);
 router.post("/nftListing", NFTmiddleware.verifyWithoutToken, nftListing);
 
 router.get(

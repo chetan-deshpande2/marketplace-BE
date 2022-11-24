@@ -104,6 +104,7 @@ module.exports = {
         (err, user) => {
           if (err) return res.send("server Error");
           if (!user) return res.send("user not found");
+          console.log({ message: "user found", user });
           return res.send({ message: "user found", user });
         }
       );
