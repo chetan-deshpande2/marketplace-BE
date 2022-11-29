@@ -202,9 +202,64 @@ module.exports = {
     try {
     } catch (error) {}
   },
+
   getUserProfilewithNfts: async (req, res) => {
+    console.log("req", req.body);
     try {
-    } catch (error) {}
+      if (!req.body.userId) {
+        return res.send("unauthorized");
+      }
+      User.findOne(
+        {
+          _id: req.body.userId,
+        },
+        {
+          oName: 1,
+          sUserName: 1,
+          sCreated: 1,
+          sEmail: 1,
+          sWalletAddress: 1,
+          sProfilePicUrl: 1,
+          sWebsite: 1,
+          sBio: 1,
+          user_followings: req.body.currUserId
+            ? {
+                $filter: {
+                  input: "$user_followings",
+                  as: "user_followings",
+                  cond: {
+                    $eq: [
+                      "$$user_followings",
+                      mongoose.Types.ObjectId(req.body.currUserId),
+                    ],
+                  },
+                },
+              }
+            : [],
+          user_followings_size: {
+            $cond: {
+              if: {
+                $isArray: "$user_followings",
+              },
+              then: {
+                $size: "$user_followings",
+              },
+              else: 0,
+            },
+          },
+          user_followers_size: 1,
+        },
+        (err, user) => {
+          if (err) return res.send("server error");
+          if (!user) return res.send("user not found");
+
+          return res.send({ message: "User Details", user });
+        }
+      );
+    } catch (error) {
+      log.red(error);
+      return res.reply(messages.server_error());
+    }
   },
   editCollaborator: async (req, res) => {
     try {

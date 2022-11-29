@@ -4,6 +4,7 @@ import aws from "aws-sdk";
 import mongoose from "mongoose";
 import pinataSDK from "@pinata/sdk";
 import multer from "multer";
+import jwt from "jsonwebtoken";
 
 import logger from "../../middleware/logger";
 import NFT from "./nftModel";
@@ -404,6 +405,7 @@ module.exports = {
       res.send(error);
     }
   },
+
   nftID: async (req, res) => {
     console.log(req.params.nNFTId);
     try {
@@ -421,33 +423,44 @@ module.exports = {
         },
       });
       if (!aNFT) return res.send("NFT Not Found");
-      aNFT = aNFT.toObject();
       console.log(aNFT);
+      aNFT = aNFT.toObject();
       aNFT.sCollectionDetail = {};
+      // req.userId = "63737c4fe305d4f9b67d3acd";
 
-      aNFT.sCollectionDetail = await Collection.findOne({
-        sName: aNFT.nCollection != undefined ? aNFT.nCollection : "-",
-      });
-      console.log(aNFT.sCollectionDetail);
+      // aNFT.sCollectionDetail = await Collection.findOne({
+      //   sName:
+      //     aNFT.sCollection && aNFT.sCollection != undefined
+      //       ? aNFT.sCollection
+      //       : "-",
+      // });
+      // console.log("Collection Details", aNFT.sCollectionDetail);
       var token = req.headers.authorization;
 
       req.userId =
         req.userId && req.userId != undefined && req.userId != null
           ? req.userId
           : "";
+      console.log(req.userId);
 
       if (token) {
         token = token.replace("Bearer ", "");
-        jwt.verify(token, process.env.JWT_SECRET_KEY, function (err, decoded) {
-          if (decoded) req.userId = decoded.id;
+        // jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+        //   if (err) return res.send("error while decoding token");
+        //   console.log("decodedId", decoded.id);
+        //   if (decoded) req.userId = decoded.id;
+        // });
+
+        // console.log(aNFT.oCurrentOwner._id);
+        // if (aNFT.oCurrentOwner._id != req.userId)
+        await NFT.findByIdAndUpdate(req.params.nNFTId, {
+          $inc: {
+            nView: 1,
+          },
         });
-        if (aNFT.oCurrentOwner._id != req.userId)
-          await NFT.findByIdAndUpdate(req.params.nNFTId, {
-            $inc: {
-              nView: 1,
-            },
-          });
+
         aNFT.loggedinUserId = req.userId;
+        console.log(aNFT.loggedinUserId);
         console.log("---------------------------8");
 
         if (!aNFT) {
@@ -1186,6 +1199,7 @@ module.exports = {
       res.send(error);
     }
   },
+
   getUserOnSaleNfts: async (req, res) => {
     try {
       console.log("req", req.body);
@@ -1317,6 +1331,7 @@ module.exports = {
       return res.send(error);
     }
   },
+
   transferNfts: async (req, res) => {
     //deduct previous owner
     console.log("req", req.body);

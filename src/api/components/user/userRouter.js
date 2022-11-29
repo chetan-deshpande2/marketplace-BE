@@ -1,5 +1,10 @@
 import express from "express";
-import { profile, updateProfile, addCollaborator } from "./userController";
+import {
+  profile,
+  updateProfile,
+  addCollaborator,
+  getUserProfilewithNfts,
+} from "./userController";
 import UserMiddleware from "../../middleware/middleware";
 
 const router = express.Router();
@@ -8,6 +13,8 @@ router.get("/profile", UserMiddleware.verifyToken, profile);
 router.post("/updateProfile", UserMiddleware.verifyToken, updateProfile);
 
 router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
+
+router.post("/profileDetail", getUserProfilewithNfts);
 //   router.post(
 //     "/collaboratorList",
 //     UserMiddleware.verifyToken,
@@ -35,7 +42,7 @@ router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
 //     userController.editCollaborator
 //   );
 //   router.get("/categories", userController.getCategories);;
-//   router.post("/profileDetail", userController.getUserProfilewithNfts);
+
 //   router.post(
 //     "/profileWithNfts",
 //     UserMiddleware.verifyWithoutToken,
