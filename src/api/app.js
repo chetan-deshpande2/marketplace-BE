@@ -11,22 +11,7 @@ import flash from "connect-flash";
 const MemoryStore = require("memorystore")(session);
 
 const app = express();
-// app.use(function (req, res, next) {
-//   res.setHeader(
-//     "Content-Security-Policy",
-//     "default-src * self  blob: data: gap://ready; style-src * self 'unsafe-inline' blob: data: gap:; script-src * 'self' 'unsafe-eval' 'unsafe-inline' blob: data: gap:; object-src * 'self' blob: data: gap:; img-src * self 'unsafe-inline' blob: data: gap:; connect-src self * 'unsafe-inline' blob: data: gap:; frame-src * self blob: data: gap:;"
-//   );
-//   next();
-// });
 app.use(cors({ credentials: true, origin: true }));
-// app.use(
-//   cors({
-//     origin: ["*"],
-//     credentials: true,
-//     allowedHeaders: "X-Requested-With, Content-Type, Authorization",
-//     methods: "GET, POST, PATCH, PUT, POST, DELETE, OPTIONS",
-//   })
-// );
 
 app.use(logger("dev"));
 app.use(cookieParser());

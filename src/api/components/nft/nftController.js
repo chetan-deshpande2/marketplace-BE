@@ -10,6 +10,8 @@ import logger from "../../middleware/logger";
 import NFT from "./nftModel";
 import NFTowners from "./nftOwnerModel";
 import Order from "../order/orderModel";
+import { Web3Storage, getFilesFromPath } from "web3.storage";
+import { GridFsStorage } from "multer-gridfs-storage";
 
 import Collection from "../collection/collectionModel";
 import multerS3 from "multer-s3";
@@ -75,7 +77,48 @@ const pinata = new pinataSDK({
     "5988caf8173c5cc986978b9bfd48060622830025ce80cc167f3c58d56ae29dbf",
 });
 
+const storage3 = new GridFsStorage({
+  url: process.env.MONGODB_URL,
+
+  file: (req, file) => {
+    match = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (match.indexOf(file.mimetype) === -1) {
+      const filename = file.originalname;
+      return filename;
+    }
+    return filename;
+  },
+});
+
+const upload2 = multer({ dest: "images/files", storage3 });
+
 module.exports = {
+  createCollection: async (req, res) => {
+    console.log(req.userId);
+    try {
+      upload2.single("nftFile")(req, res, async (error) => {
+        console.log(req.file.originalname);
+
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlCMzlDMDMxQUQ2OTg0Mzk4RTQ1NzQ0YTk2YzNkMzc0ZDU0YURENTAiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk3MzAwNDk1NTYsIm5hbWUiOiJtYXJrZXRwbGFjZSJ9.io0FvRpm6l-nbxxRGDMZii4s03ErdxJbGaC3yEHXzFM";
+
+        if (!token) {
+          console.error(
+            "A token is needed. You can create one on https://web3.storage"
+          );
+          return;
+        }
+        const storage = new Web3Storage({ token });
+        const files = await getFilesFromPath(req.file.path);
+        const cid = await storage.put(files);
+        console.log("Content added with CID:", cid);
+        console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
+      });
+    } catch (error) {
+      res.status(401).send("cannot send data");
+    }
+  },
+
   create: async (req, res, next) => {
     try {
       // if (!req.userId) return res.send("Unauthorized access");
@@ -181,9 +224,6 @@ module.exports = {
                       quantity: req.body.nQuantity,
                     });
                     await nft.save().then(async (result) => {
-                      //increment collection nextId by 1
-                      //update the collection and increment the nextId
-
                       const collection = await Collection.findOne({
                         sContractAddress: contractAddress,
                       });

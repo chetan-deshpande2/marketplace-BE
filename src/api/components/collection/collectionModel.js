@@ -33,6 +33,7 @@ const collectionSchema = mongoose.Schema({
   sRoyaltyPercentage: Number,
   sName: String,
   sDescription: String,
+  sImageName: String,
 });
 
 collectionSchema.methods.getNextId = function () {

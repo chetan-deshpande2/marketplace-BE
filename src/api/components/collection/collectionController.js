@@ -2,141 +2,74 @@ import fs from "fs";
 import http from "http";
 import aws from "aws-sdk";
 import mongoose from "mongoose";
-import pinataSDK from "@pinata/sdk";
+
 import multer from "multer";
 import multerS3 from "multer-s3";
-
-import uuid from "uuid";
+import minimist from "minimist";
+import { Web3Storage, getFilesFromPath } from "web3.storage";
+import { GridFsStorage } from "multer-gridfs-storage";
+import util from "util";
+import path from "path";
 import logger from "../../middleware/logger";
 
 import Collection from "./collectionModel";
 
-// Set S3 endpoint to DigitalOcean Spaces
-const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
-const s3 = new aws.S3({
-  endpoint: spacesEndpoint,
-  accessKeyId: "P2YPJ7LF6WDBJSPFUAYL",
-  secretAccessKey: "ELKZoA86+kAtvWVraYx3ZDLi5jswMZuu4Gb3q6Pu9J0",
-});
+const storage3 = new GridFsStorage({
+  url: process.env.MONGODB_URL,
 
-const storage = multerS3({
-  s3: s3,
-  bucket: "staging-decrypt-nft-io",
-  acl: "public-read",
-  contentType: multerS3.AUTO_CONTENT_TYPE,
-  key: function (request, file, cb) {
-    cb(null, file.originalname);
+  file: (req, file) => {
+    match = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (match.indexOf(file.mimetype) === -1) {
+      const filename = file.originalname;
+      return filename;
+    }
+    return filename;
   },
 });
 
-var allowedMimes;
-var errAllowed;
-
-let fileFilter = function (req, file, cb) {
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(
-      {
-        success: false,
-        message: `Invalid file type! Only ${errAllowed}  files are allowed.`,
-      },
-      false
-    );
-  }
-};
-
-let oMulterObj = {
-  storage: storage1,
-  limits: {
-    fileSize: 15 * 1024 * 1024, // 15mb
-  },
-  fileFilter: fileFilter,
-};
-
-const storage1 = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
-  filename: (req, file, cb) => {
-    const { originalname } = file;
-
-    cb(null, `${originalname}`);
-  },
-});
-
-const upload = multer(oMulterObj);
-const uploadBanner = multer(oMulterObj);
-
-const pinata = new pinataSDK({
-  pinataApiKey: "3ea7991864f4a7d2f998",
-  pinataSecretApiKey:
-    "5988caf8173c5cc986978b9bfd48060622830025ce80cc167f3c58d56ae29dbf",
-});
+const upload2 = multer({ dest: "images/files", storage3 });
 
 module.exports = {
-  uploadCollection: async (req, res, next) => {
-    try {
-      res.send("Successfully uploaded " + req.files.length + " files!");
-    } catch (error) {
-      res.status(401).send("cannot send data");
-    }
-  },
   createCollection: async (req, res) => {
     console.log(req.userId);
     try {
-      allowedMimes = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
-      errAllowed = "JPG, JPEG, PNG,GIF";
+      upload2.single("nftFile")(req, res, async (error) => {
+        console.log(req.file.originalname);
 
-      uploadBanner.single("nftFile")(req, res, (error) => {
-        if (error) {
-          fs.unlinkSync(req.file.path);
-          res.send(error);
-        } else {
-          let filename = req.file.originalname;
-          res.send(filename);
-        }
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlCMzlDMDMxQUQ2OTg0Mzk4RTQ1NzQ0YTk2YzNkMzc0ZDU0YURENTAiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk3MzAwNDk1NTYsIm5hbWUiOiJtYXJrZXRwbGFjZSJ9.io0FvRpm6l-nbxxRGDMZii4s03ErdxJbGaC3yEHXzFM";
 
-        const oOptions = {
-          pinataMetadata: {
-            name: req.file.originalname,
-          },
-          pinataOptions: {
-            cidVersion: 0,
-          },
-        };
-        const pathString = "/tmp/";
-        const file = fs.createWriteStream(pathString + req.file.originalname);
-        const request = http.get("http://localhost:3000/", (response) => {
-          var stream = response.pipe(file);
-          const readableStreamForFile = fs.createReadStream(
-            pathString + req.file.originalname
+        if (!token) {
+          console.error(
+            "A token is needed. You can create one on https://web3.storage"
           );
-          stream.on("finish", async () => {
-            pinata
-              .pinFileToIPFS(readableStreamForFile, oOptions)
-              .then(async (file2) => {
-                const collection = new Collection({
-                  sHash: file2.IpfsHash,
-                  sName: req.body.sName,
-                  sDescription: req.body.sDescription,
-                  erc721: req.body.erc721,
-                  sContractAddress: req.body.sContractAddress,
-                  sRoyaltyPercentage: req.body.sRoyaltyPercentage,
-                  oCreatedBy: req.userId,
-                  nextId: 0,
-                  collectionImage: req.file.location,
-                });
-                collection.save().then((result) => {
-                  console.log({ message: "Collection Created ", result });
-                  return;
-                });
-              });
-          });
+          return;
+        }
+        const storage = new Web3Storage({ token });
+        const files = await getFilesFromPath(req.file.path);
+        const cid = await storage.put(files);
+        console.log("Content added with CID:", cid);
+        console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
+
+        const collection = new Collection({
+          sHash: cid,
+          sName: req.body.sName,
+          sDescription: req.body.sDescription,
+          erc721: req.body.erc721,
+          sContractAddress: req.body.sContractAddress,
+          sRoyaltyPercentage: req.body.sRoyaltyPercentage,
+          oCreatedBy: req.userId,
+          nextId: 0,
+          collectionImage: req.file.location,
+          sImageName: req.file.filename,
+        });
+        collection.save().then((result) => {
+          console.log({ message: "Collection Created ", result });
+          return;
         });
       });
     } catch (error) {
-      return res.error("error ");
+      res.status(401).send("cannot send data");
     }
   },
 
@@ -197,7 +130,6 @@ module.exports = {
       if (!aCollections) {
         return res.send("Collection Not Found");
       }
-      console.log("aCollections", aCollections);
       results.results = aCollections;
       results.count = await Collection.countDocuments({
         oCreatedBy: { $in: [mongoose.Types.ObjectId(req.userId)] },

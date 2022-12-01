@@ -10,6 +10,7 @@ import User from "./userModel";
 import NFT from "../nft/nftModel";
 
 // Set S3 endpoint to DigitalOcean Spaces
+// Set S3 endpoint to DigitalOcean Spaces
 const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
 const s3 = new aws.S3({
   endpoint: spacesEndpoint,
@@ -112,26 +113,62 @@ module.exports = {
       res.send(error);
     }
   },
+
   updateProfile: async (req, res) => {
     try {
       if (!req.userId) return res.send("UnAuthorized");
       console.log(req.userId);
-      // File upload
       let oProfileDetails = {};
-      uploadBanner("single")(req, res, async (error) => {
+      uploadBanner("userProfile")(req, res, async (error) => {
+        console.log("inside");
         if (error) return res.send("bad Request");
         await User.findOne(
           {
             sUserName: req.userId,
           },
-          (err, user) => {
+          async (err, user) => {
             if (err) return res.send("user not found");
             if (user)
               if (user._id.toString() !== req.userId.toString()) {
-                return res.send(
-                  "User with Username ' " + req.body.sUserName + "'"
-                );
+                return res.send({ message: "user Already Exists" });
               }
+            console.log("P1");
+            oProfileDetails = {
+              sUserName: req.body.sUserName,
+              oName: {
+                sFirstname: req.body.sFirstname,
+                sLastname: req.body.sLastname,
+              },
+              sWebsite: req.body.sWebsite,
+              sBio: req.body.sBio,
+              sEmail: req.body.sEmail,
+            };
+            console.log("here--->>");
+            const aAllowedMimes = [
+              "image/jpeg",
+              "image/jpg",
+              "image/png",
+              "image/gif",
+            ];
+            if (req.file !== undefined) {
+              if (!aAllowedMimes.includes(req.file.mimetype)) {
+                return res.send("Invalid File");
+              }
+
+              oProfileDetails["sProfilePicUrl"] = req.file.location;
+
+              console.log("req.file.location", req.file.location);
+            }
+            await User.findByIdAndUpdate(
+              req.userId,
+              oProfileDetails,
+              (err, user) => {
+                if (err) return res.send("Server Error");
+                if (!user) return res.send("user not found");
+                req.session["name"] = req.body.sFirstname;
+                return res.send("User Details Updated");
+              }
+            );
           }
         );
       });
@@ -257,8 +294,7 @@ module.exports = {
         }
       );
     } catch (error) {
-      log.red(error);
-      return res.reply(messages.server_error());
+      return res.send(error);
     }
   },
   editCollaborator: async (req, res) => {
