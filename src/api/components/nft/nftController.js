@@ -1,4 +1,5 @@
-import fs from "fs";
+import { Web3Storage, getFilesFromPath } from "web3.storage";
+import fs, { writeFile, createReadStream } from "fs";
 import http from "http";
 import aws from "aws-sdk";
 import mongoose from "mongoose";
@@ -10,11 +11,12 @@ import logger from "../../middleware/logger";
 import NFT from "./nftModel";
 import NFTowners from "./nftOwnerModel";
 import Order from "../order/orderModel";
-import { Web3Storage, getFilesFromPath } from "web3.storage";
+
 import { GridFsStorage } from "multer-gridfs-storage";
 
 import Collection from "../collection/collectionModel";
 import multerS3 from "multer-s3";
+import { setTimeout } from "timers";
 
 const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
 const s3 = new aws.S3({
@@ -93,7 +95,7 @@ const storage3 = new GridFsStorage({
 const upload2 = multer({ dest: "images/files", storage3 });
 
 module.exports = {
-  createCollection: async (req, res) => {
+  createNFT: async (req, res) => {
     console.log(req.userId);
     try {
       upload2.single("nftFile")(req, res, async (error) => {
@@ -113,6 +115,38 @@ module.exports = {
         const cid = await storage.put(files);
         console.log("Content added with CID:", cid);
         console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
+
+        let newDate = Math.floor(Date.now() / 1000);
+        let newData = {
+          external_url: "",
+          image: `http://${cid}.ipfs.w3s.link/${req.file.filename}`,
+          name: "Crypto Punk",
+          attributes: "[]",
+        };
+
+        console.log(JSON.stringify(newData));
+        let path = `./images/input${newDate}.json`;
+        fs.writeFileSync(path, JSON.stringify(newData, null, 2), (error) => {
+          if (error) {
+            console.log("An error has occurred ", error);
+            return;
+          }
+          return;
+        });
+        console.log("===========");
+        console.log(`./images/input${newDate}.json`);
+
+        setTimeout(async () => {
+          const stream = createReadStream(`./images/input${newDate}.json`);
+          res.send("data");
+          // const cid2 = await storage.put([
+          //   { name: `input${newDate}.json`, stream: () => stream },
+          // ]);
+
+          // res.send(cid2);
+          // console.log("Content added with CID 2====>:", cid2);
+          // console.log(`http://${cid2}.ipfs.w3s.link/nft${newDate}.json`);
+        }, 5000);
       });
     } catch (error) {
       res.status(401).send("cannot send data");
@@ -463,18 +497,18 @@ module.exports = {
         },
       });
       if (!aNFT) return res.send("NFT Not Found");
-      console.log(aNFT);
+      console.log("============dsfdsf", aNFT);
       aNFT = aNFT.toObject();
       aNFT.sCollectionDetail = {};
-      // req.userId = "63737c4fe305d4f9b67d3acd";
+      req.userId = "63737c4fe305d4f9b67d3acd";
 
-      // aNFT.sCollectionDetail = await Collection.findOne({
-      //   sName:
-      //     aNFT.sCollection && aNFT.sCollection != undefined
-      //       ? aNFT.sCollection
-      //       : "-",
-      // });
-      // console.log("Collection Details", aNFT.sCollectionDetail);
+      aNFT.sCollectionDetail = await Collection.findOne({
+        sName:
+          aNFT.sCollection && aNFT.sCollection != undefined
+            ? aNFT.sCollection
+            : "-",
+      });
+      console.log("Collection Details", aNFT.sCollectionDetail);
       var token = req.headers.authorization;
 
       req.userId =
@@ -485,22 +519,22 @@ module.exports = {
 
       if (token) {
         token = token.replace("Bearer ", "");
-        // jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
-        //   if (err) return res.send("error while decoding token");
-        //   console.log("decodedId", decoded.id);
-        //   if (decoded) req.userId = decoded.id;
-        // });
-
-        // console.log(aNFT.oCurrentOwner._id);
-        // if (aNFT.oCurrentOwner._id != req.userId)
-        await NFT.findByIdAndUpdate(req.params.nNFTId, {
-          $inc: {
-            nView: 1,
-          },
+        jwt.verify(token, process.env.JWT_SECRET_KEY, (err, decoded) => {
+          if (err) return res.send("error while decoding token");
+          console.log("decodedId", decoded.id);
+          if (decoded) req.userId = decoded.id;
         });
 
+        console.log(aNFT.oCurrentOwner._id);
+        if (aNFT.oCurrentOwner._id != req.userId)
+          await NFT.findByIdAndUpdate(req.params.nNFTId, {
+            $inc: {
+              nView: 1,
+            },
+          });
+
         aNFT.loggedinUserId = req.userId;
-        console.log(aNFT.loggedinUserId);
+        console.log("==================", aNFT.loggedinUserId);
         console.log("---------------------------8");
 
         if (!aNFT) {

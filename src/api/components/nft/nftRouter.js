@@ -18,6 +18,7 @@ import {
   transferNfts,
   getSearchedNft,
   updateNFTDeatils,
+  createNFT,
 } from "./nftController";
 import NFTmiddleware from "../../middleware/middleware";
 
@@ -49,7 +50,8 @@ router.post("/updateNFTDeatils", updateNFTDeatils);
 router.post(
   "/getOnSaleItems",
   NFTmiddleware.verifyWithoutToken,
-  getOnSaleItems
+  getOnSaleItems,
+  createNFT
 );
 
 router.put("/toggleSellingType", NFTmiddleware.verifyToken, toggleSellingType);
@@ -61,6 +63,7 @@ router.post("/getOwnedNFTList", getOwnedNFTList);
 router.post("/getUserOnSaleNfts", getUserOnSaleNfts);
 router.put("/transferNfts", NFTmiddleware.verifyToken, transferNfts);
 router.post("/getSearchedNft", getSearchedNft);
+router.post("/createNFT", createNFT);
 
 // router.post("/like", NFTmiddleware.verifyToken, nftController.likeNFT);
 // router.post("/getUserLikedNfts", nftController.getUserLikedNfts);
