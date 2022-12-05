@@ -1572,4 +1572,100 @@ module.exports = {
       res.send(error);
     }
   },
+  getHotCollection: async () => {
+    try {
+      let data = [];
+      let setConditions = {};
+      let sTextsearch = req.body.sTextsearch;
+      const erc721 = req.body.erc721;
+
+      if (req.body.conditions) {
+        setConditions = req.body.conditions;
+      }
+
+      //sortKey is the column
+      const sortKey = req.body.sortKey ? req.body.sortKey : "";
+
+      //sortType will let you choose from ASC 1 or DESC -1
+      const sortType = req.body.sortType ? req.body.sortType : -1;
+
+      var sortObject = {};
+      var stype = sortKey;
+      var sdir = sortType;
+      sortObject[stype] = sdir;
+
+      let CollectionSearchArray = [];
+      if (sTextsearch !== "") {
+        CollectionSearchArray["sName"] = {
+          $regex: new RegExp(sTextsearch),
+          $options: "<options>",
+        };
+      }
+
+      if (erc721 !== "" && erc721) {
+        CollectionSearchArray["erc721"] = true;
+      }
+      if (erc721 !== "" && erc721 === false) {
+        CollectionSearchArray["erc721"] = false;
+      }
+      let CollectionSearchObj = Object.assign({}, CollectionSearchArray);
+
+      const page = parseInt(req.body.page);
+      const limit = parseInt(req.body.limit);
+
+      const startIndex = (page - 1) * limit;
+      const endIndex = page * limit;
+
+      const results = {};
+
+      if (
+        endIndex < (await Collection.countDocuments(CollectionSearchObj).exec())
+      ) {
+        results.next = {
+          page: page + 1,
+          limit: limit,
+        };
+      }
+
+      if (startIndex > 0) {
+        results.previous = {
+          page: page - 1,
+          limit: limit,
+        };
+      }
+
+      let aCollections = await Collection.aggregate([
+        {
+          $lookup: {
+            from: "users",
+            localField: "oCreatedBy",
+            foreignField: "_id",
+            as: "oUser",
+          },
+        },
+        {
+          $sort: {
+            sCreated: req.body.sortType,
+          },
+        },
+        { $match: CollectionSearchObj },
+        {
+          $skip: (page - 1) * limit,
+        },
+        {
+          $limit: limit,
+        },
+      ]);
+
+      results.results = aCollections;
+      results.count = await Collection.countDocuments(
+        CollectionSearchObj
+      ).exec();
+      console.log(data);
+      res.header("Access-Control-Max-Age", 600);
+      return res.send({ message: "Collections List", results });
+    } catch (error) {
+      res.send(error);
+    }
+  },
 };
