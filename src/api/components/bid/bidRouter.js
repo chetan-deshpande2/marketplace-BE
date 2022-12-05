@@ -11,7 +11,7 @@ const router = express.Router();
 
 router.post("/createBid", createBidNft);
 router.post("/updateBid", updateBid);
-router.post("/fetchBidNft", fetchBidNft);
+router.post("/fetchBidNft", bidMiddleware.verifyToken, fetchBidNft);
 router.post("/acceptBidNft", acceptBidNft);
 
 module.exports = router;

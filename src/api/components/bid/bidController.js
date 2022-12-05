@@ -104,7 +104,7 @@ module.exports = {
   fetchBidNft: async (req, res) => {
     console.log(req.body);
     try {
-      if (!req.userId) return res.reply(messages.unauthorized());
+      if (!req.userId) return res.send("unauthorized");
       let nftID = req.body.nNFTId;
       let orderID = req.body.orderID;
       let buyerID = req.body.buyerID;
@@ -196,14 +196,16 @@ module.exports = {
       console.log("Datat" + data[0].bids.length);
       let iFiltered = data[0].bids.length;
       if (data[0].totalCount[0] == undefined) {
-        return res.send("Bid Details", {
+        return res.send({
+          message: "Bid Details",
           data: [],
           draw: req.body.draw,
           recordsTotal: 0,
           recordsFiltered: 0,
         });
       } else {
-        return res.send("Bid Details", {
+        return res.send({
+          message: "Bid Details",
           data: data[0].bids,
           draw: req.body.draw,
           recordsTotal: data[0].totalCount[0].count,

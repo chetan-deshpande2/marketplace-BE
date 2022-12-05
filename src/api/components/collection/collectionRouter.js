@@ -44,7 +44,7 @@ router.post(
 );
 router.post("/getSearchedNft", getSearchedNFT);
 
-router.get(
+router.post(
   "/updateCollectionToken/:collectionAddress",
   NFTmiddleware.verifyToken,
   updateCollectionToken

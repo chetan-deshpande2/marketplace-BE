@@ -24,9 +24,7 @@ const nftSchema = mongoose.Schema({
   nRoyaltyPercentage: Number,
   nQuantity: Number,
   nView: Number,
-  nNftImage: { type: String,
-     require: true
-     },
+  nNftImage: { type: String, require: true },
   nType: {
     type: Number,
     require: true,

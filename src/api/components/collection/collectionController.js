@@ -559,7 +559,9 @@ module.exports = {
       return res.send(error);
     }
   },
+
   updateCollectionToken: async (req, res) => {
+    console.log(req.params.collectionAddress);
     try {
       if (!req.params.collectionAddress)
         return res.send("Contract Address Not Found");
@@ -569,10 +571,14 @@ module.exports = {
         sContractAddress: contractAddress,
       });
       let nextId = collection.getNextId();
+      console.log(nextId);
 
       collection.nextId = nextId + 1;
+
       collection.save();
-      return res.send("Token Updated", nextId + 1);
+      const data = nextId + 1;
+      console.log(nextId + 1);
+      return res.send({ message: "Collection Details", data });
     } catch (error) {
       return res.send(error);
     }
