@@ -5,6 +5,6 @@ import historyMiddleware from "../../middleware/middleware";
 const router = express.Router();
 
 router.post("/insert", insertHistory);
-router.get("/fetchHistory", fetchHistory);
+router.post("/fetchHistory", fetchHistory);
 
 module.exports = router;
