@@ -199,12 +199,12 @@ module.exports = {
           nLazyMintingStatus: req.body.nLazyMintingStatus,
         });
         nft.nOwnedBy.push({
-          address: creatorAddress,
+          address: req.body.nCreatorAddress,
           quantity: req.body.nQuantity,
         });
         await nft.save().then(async (result) => {
           const collection = await Collection.findOne({
-            sContractAddress: contractAddress,
+            sContractAddress: req.body.nCollection,
           });
           let nextId = collection.getNextId();
           collection.nextId = nextId;
@@ -1572,7 +1572,7 @@ module.exports = {
       res.send(error);
     }
   },
-  getHotCollection: async () => {
+  getHotCollection: async (req, res) => {
     try {
       let data = [];
       let setConditions = {};
