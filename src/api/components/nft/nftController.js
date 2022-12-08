@@ -1668,4 +1668,182 @@ module.exports = {
       res.send(error);
     }
   },
+
+  // getOwnedNFTList: async (req, res) => {
+  //   try {
+  //     let data = [];
+  //     console.log("req", req.body);
+  //     //sortKey is the column
+  //     const sortKey = req.body.sortKey ? req.body.sortKey : "";
+
+  //     //sortType will let you choose from ASC 1 or DESC -1
+  //     const sortType = req.body.sortType ? req.body.sortType : -1;
+  //     var sortObject = {};
+  //     var stype = sortKey;
+  //     var sdir = sortType;
+  //     sortObject[stype] = sdir;
+  //     const page = parseInt(req.body.page);
+  //     const limit = parseInt(req.body.limit);
+
+  //     const startIndex = (page - 1) * limit;
+  //     const endIndex = page * limit;
+
+  //     const results = {};
+  //     if (req.body.searchType === "owned") {
+  //       if (
+  //         endIndex <
+  //         (await NFT.countDocuments({
+  //           nOwnedBy: {
+  //             $elemMatch: {
+  //               address: req.body.userWalletAddress,
+  //               quantity: { $gt: 0 },
+  //             },
+  //           },
+  //         }).exec())
+  //       ) {
+  //         results.next = {
+  //           page: page + 1,
+  //           limit: limit,
+  //         };
+  //       }
+  //       if (startIndex > 0) {
+  //         results.previous = {
+  //           page: page - 1,
+  //           limit: limit,
+  //         };
+  //       }
+  //       await NFT.find({
+  //         nOwnedBy: {
+  //           $elemMatch: {
+  //             address: req.body.userWalletAddress,
+  //             quantity: { $gt: 0 },
+  //           },
+  //         },
+  //       })
+  //         .select({
+  //           nTitle: 1,
+  //           nCollection: 1,
+  //           nHash: 1,
+  //           nUser_likes: 1,
+  //           nNftImage: 1,
+  //           nLazyMintingStatus: 1,
+  //         })
+  //         .populate({
+  //           path: "nOrders",
+  //           options: {
+  //             limit: 1,
+  //           },
+  //           select: {
+  //             oPrice: 1,
+  //             oType: 1,
+  //             oValidUpto: 1,
+  //             auction_end_date: 1,
+  //             oStatus: 1,
+  //             _id: 0,
+  //           },
+  //         })
+  //         .populate({
+  //           path: "nCreater",
+  //           options: {
+  //             limit: 1,
+  //           },
+  //           select: {
+  //             _id: 1,
+  //             sProfilePicUrl: 1,
+  //             sWalletAddress: 1,
+  //           },
+  //         })
+  //         .limit(limit)
+  //         .skip(startIndex)
+  //         .exec()
+  //         .then((res) => {
+  //           console.log("dataa", res);
+  //           data.push(res);
+  //         })
+  //         .catch((e) => {
+  //           console.log("Error", e);
+  //         }); // console.log("ress", resust);
+  //       results.count = await NFT.countDocuments({
+  //         nOwnedBy: {
+  //           $elemMatch: {
+  //             address: req.body.userWalletAddress,
+  //             quantity: { $gt: 0 },
+  //           },
+  //         },
+  //       }).exec();
+  //     } else {
+  //       if (
+  //         endIndex <
+  //         (await NFT.countDocuments({
+  //           nCreater: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
+  //         }).exec())
+  //       ) {
+  //         results.next = {
+  //           page: page + 1,
+  //           limit: limit,
+  //         };
+  //       }
+  //       if (startIndex > 0) {
+  //         results.previous = {
+  //           page: page - 1,
+  //           limit: limit,
+  //         };
+  //       }
+  //       await NFT.find({
+  //         nCreater: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
+  //       })
+  //         .select({
+  //           nTitle: 1,
+  //           nCollection: 1,
+  //           nHash: 1,
+  //           nUser_likes: 1,
+  //           nNftImage: 1,
+  //         })
+  //         .populate({
+  //           path: "nOrders",
+  //           options: {
+  //             limit: 1,
+  //           },
+  //           select: {
+  //             oPrice: 1,
+  //             oType: 1,
+  //             oValidUpto: 1,
+  //             auction_end_date: 1,
+  //             oStatus: 1,
+  //             _id: 0,
+  //           },
+  //         })
+  //         .populate({
+  //           path: "nCreater",
+  //           options: {
+  //             limit: 1,
+  //           },
+  //           select: {
+  //             _id: 1,
+  //             sProfilePicUrl: 1,
+  //             sWalletAddress: 1,
+  //           },
+  //         })
+  //         .limit(limit)
+  //         .skip(startIndex)
+  //         .exec()
+  //         .then((res) => {
+  //           console.log("dataa", res);
+  //           data.push(res);
+  //         })
+  //         .catch((e) => {
+  //           console.log("Error", e);
+  //         });
+  //       // console.log("ress", resust);
+  //       results.count = await NFT.countDocuments({
+  //         nCreater: { $in: [mongoose.Types.ObjectId(req.body.userId)] },
+  //       }).exec();
+  //     }
+  //     results.results = data;
+
+  //     return res.send({ message: "NFTs List", results });
+  //   } catch (error) {
+  //     res.send(error);
+  //   }
+  // },
 };
