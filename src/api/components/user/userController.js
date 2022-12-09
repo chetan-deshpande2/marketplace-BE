@@ -8,64 +8,23 @@ import multerS3 from "multer-s3";
 
 import User from "./userModel";
 import NFT from "../nft/nftModel";
+import { Web3Storage, getFilesFromPath } from "web3.storage";
+import { GridFsStorage } from "multer-gridfs-storage";
 
-// Set S3 endpoint to DigitalOcean Spaces
-// Set S3 endpoint to DigitalOcean Spaces
-const spacesEndpoint = new aws.Endpoint("sgp1.digitaloceanspaces.com");
-const s3 = new aws.S3({
-  endpoint: spacesEndpoint,
-  accessKeyId: "P2YPJ7LF6WDBJSPFUAYL",
-  secretAccessKey: "ELKZoA86+kAtvWVraYx3ZDLi5jswMZuu4Gb3q6Pu9J0",
-});
+const storage3 = new GridFsStorage({
+  url: process.env.MONGODB_URL,
 
-const storage = multerS3({
-  s3: s3,
-  bucket: "staging-decrypt-nft-io",
-  acl: "public-read",
-  contentType: multerS3.AUTO_CONTENT_TYPE,
-  key: function (request, file, cb) {
-    cb(null, file.originalname);
+  file: (req, file) => {
+    match = ["image/jpeg", "image/jpg", "image/png", "image/gif"];
+    if (match.indexOf(file.mimetype) === -1) {
+      const filename = file.originalname;
+      return filename;
+    }
+    return filename;
   },
 });
 
-var allowedMimes;
-var errAllowed;
-
-let fileFilter = function (req, file, cb) {
-  if (allowedMimes.includes(file.mimetype)) {
-    cb(null, true);
-  } else {
-    cb(
-      {
-        success: false,
-        message: `Invalid file type! Only ${errAllowed}  files are allowed.`,
-      },
-      false
-    );
-  }
-};
-
-let oMulterObj = {
-  storage: storage1,
-  limits: {
-    fileSize: 15 * 1024 * 1024, // 15mb
-  },
-  fileFilter: fileFilter,
-};
-
-const storage1 = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, "uploads");
-  },
-  filename: (req, file, cb) => {
-    const { originalname } = file;
-
-    cb(null, `${originalname}`);
-  },
-});
-
-const upload = multer(oMulterObj);
-const uploadBanner = multer(oMulterObj);
+const upload2 = multer({ dest: "images/files", storage3 });
 
 const pinata = new pinataSDK({
   pinataApiKey: "3ea7991864f4a7d2f998",
@@ -116,12 +75,32 @@ module.exports = {
 
   updateProfile: async (req, res) => {
     try {
+      console.log("inside try");
       if (!req.userId) return res.send("UnAuthorized");
       console.log(req.userId);
       let oProfileDetails = {};
-      uploadBanner("userProfile")(req, res, async (error) => {
+
+      upload2("userProfile")(req, res, async (error) => {
         console.log("inside");
-        if (error) return res.send("bad Request");
+
+
+        console.log(req.file.originalname);
+
+        const token =
+          "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlCMzlDMDMxQUQ2OTg0Mzk4RTQ1NzQ0YTk2YzNkMzc0ZDU0YURENTAiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk3MzAwNDk1NTYsIm5hbWUiOiJtYXJrZXRwbGFjZSJ9.io0FvRpm6l-nbxxRGDMZii4s03ErdxJbGaC3yEHXzFM";
+
+        if (!token) {
+          console.error(
+            "A token is needed. You can create one on https://web3.storage"
+          );
+          return;
+        }
+        const storage = new Web3Storage({ token });
+        const files = await getFilesFromPath(req.file.path);
+        const cid = await storage.put(files);
+        console.log("Content added with CID:", cid);
+        console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
+
         await User.findOne(
           {
             sUserName: req.userId,
@@ -142,30 +121,16 @@ module.exports = {
               sWebsite: req.body.sWebsite,
               sBio: req.body.sBio,
               sEmail: req.body.sEmail,
+              sImageName: req.file.originalname,
+              sHash: cid,
             };
             console.log("here--->>");
-            const aAllowedMimes = [
-              "image/jpeg",
-              "image/jpg",
-              "image/png",
-              "image/gif",
-            ];
-            if (req.file !== undefined) {
-              if (!aAllowedMimes.includes(req.file.mimetype)) {
-                return res.send("Invalid File");
-              }
-
-              oProfileDetails["sProfilePicUrl"] = req.file.location;
-
-              console.log("req.file.location", req.file.location);
-            }
             await User.findByIdAndUpdate(
               req.userId,
               oProfileDetails,
               (err, user) => {
                 if (err) return res.send("Server Error");
                 if (!user) return res.send("user not found");
-                req.session["name"] = req.body.sFirstname;
                 return res.send("User Details Updated");
               }
             );

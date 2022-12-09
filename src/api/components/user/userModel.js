@@ -32,6 +32,8 @@ const userSchema = mongoose.Schema({
   sBio: String,
   sWebsite: String,
   sProfilePicUrl: String,
+  sImageName: String,
+  sHash: String,
   user_followings: [
     {
       type: mongoose.Schema.ObjectId,
