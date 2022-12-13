@@ -26,11 +26,7 @@ router.post(
   getCollectionDetails
 );
 
-router.post(
-  "/getCollectionDetailsByAddress",
-  NFTmiddleware.verifyWithoutToken,
-  getCollectionDetailsByAddress
-);
+router.post("/getCollectionDetailsByAddress", getCollectionDetailsByAddress);
 router.get("/myCollectionList", NFTmiddleware.verifyToken, userCollectionList);
 
 router.get("/getcollections", NFTmiddleware.verifyToken, getCollections);

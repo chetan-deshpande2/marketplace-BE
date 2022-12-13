@@ -157,7 +157,7 @@ module.exports = {
         (err, collection) => {
           if (err) return res.send("server error");
           if (!collection) return res.send("Collection Not Found");
-          return res.send("Collection Details", collection);
+          return res.send({ message: "Collection Details", collection });
         }
       );
     } catch (error) {
@@ -573,11 +573,11 @@ module.exports = {
       let nextId = collection.getNextId();
       console.log(nextId);
 
-      collection.nextId = nextId + 1;
+      collection.nextId = nextId;
 
       collection.save();
-      const data = nextId + 1;
-      console.log(nextId + 1);
+      const data = nextId;
+      console.log(nextId);
       return res.send({ message: "Collection Details", data });
     } catch (error) {
       return res.send(error);
