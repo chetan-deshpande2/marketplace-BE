@@ -50,7 +50,7 @@ module.exports = {
       bidData
         .save()
         .then(async (result) => {
-          return res.send("Bid Placed", result);
+          return res.send({ message: "Bid Placed", result });
         })
         .catch((error) => {
           console.log("Created Bid error", error);
@@ -101,6 +101,7 @@ module.exports = {
       res.send(error);
     }
   },
+
   fetchBidNft: async (req, res) => {
     console.log(req.body);
     try {
