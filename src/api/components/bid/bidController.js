@@ -103,7 +103,6 @@ module.exports = {
   },
 
   fetchBidNft: async (req, res) => {
-    console.log(req.body);
     try {
       if (!req.userId) return res.send("unauthorized");
       let nftID = req.body.nNFTId;
@@ -128,48 +127,48 @@ module.exports = {
       if (buyerID != "All") {
         obuyerIDQuery = { oBidder: mongoose.Types.ObjectId(buyerID) };
       }
-      console.log(filters);
+
       let data = await Bid.aggregate([
         {
           $match: {
             $and: [
               { oBidQuantity: { $gte: 1 } },
-              { oBidStatus: "Bid" },
+              { bidStatus: "Bid" },
               oTypeQuery,
-              onftIDQuery,
-              oorderIDQuery,
-              obuyerIDQuery,
+              nftIDQuery,
+              orderIDQuery,
+              buyerIDQuery,
             ],
           },
         },
         {
           $project: {
             _id: 1,
-            oBidder: 1,
-            oOwner: 1,
-            oBidStatus: 1,
+            bidderID: 1,
+            owner: 1,
+            bidStatus: 1,
             oBidPrice: 1,
-            oNFTId: 1,
-            oOrderId: 1,
+            nftID: 1,
+            orderID: 1,
             oBidQuantity: 1,
-            oBuyerSignature: 1,
+            buyerSignature: 1,
             oBidDeadline: 1,
           },
         },
         {
           $lookup: {
             from: "users",
-            localField: "oBidder",
+            localField: "bidderID",
             foreignField: "_id",
-            as: "oBidder",
+            as: "bidderID",
           },
         },
         {
           $lookup: {
             from: "users",
-            localField: "oOwner",
+            localField: "owner",
             foreignField: "_id",
-            as: "oOwner",
+            as: "owner",
           },
         },
         {
@@ -177,8 +176,8 @@ module.exports = {
             sCreated: -1,
           },
         },
-        { $unwind: "$oBidder" },
-        { $unwind: "$oOwner" },
+        { $unwind: "$bidderID" },
+        { $unwind: "$owner" },
         {
           $facet: {
             bids: [
