@@ -240,7 +240,7 @@ module.exports = {
           recordsFiltered: iFiltered,
         });
       } else {
-        return res.send("Collection Details", {
+        return res.send( {message:"Collection Details",
           data: aCollections[0].collections,
           draw: req.body.draw,
           recordsTotal: aCollections[0].totalCount[0].count,
