@@ -113,32 +113,61 @@ module.exports = {
       let onftIDQuery = {};
       let oorderIDQuery = {};
       let obuyerIDQuery = {};
-
       let filters = [];
-      if (bidStatus != "All") {
-        oTypeQuery = { oBidStatus: mongoose.Types.ObjectId(bidStatus) };
-      }
-      if (nftID != "All") {
-        onftIDQuery = { oNFTId: mongoose.Types.ObjectId(nftID) };
-      }
-      if (orderID != "All") {
-        oorderIDQuery = { oOrderId: mongoose.Types.ObjectId(orderID) };
-      }
-      if (buyerID != "All") {
-        obuyerIDQuery = { oBidder: mongoose.Types.ObjectId(buyerID) };
-      }
+      // if (bidStatus != "All") {
+      //   oTypeQuery = { oBidStatus: mongoose.Types.ObjectId(bidStatus) };
+      // }
+      // if (nftID != "All") {
+      //   onftIDQuery = { oNFTId: mongoose.Types.ObjectId(nftID) };
+      // }
+      // if (orderID != "All") {
+      //   oorderIDQuery = { oOrderId: mongoose.Types.ObjectId(orderID) };
+      // }
+      // if (buyerID != "All") {
+      //   obuyerIDQuery = { oBidder: mongoose.Types.ObjectId(buyerID) };
+      // }
+
+      let getData = await Bid.aggregate([
+        {
+          $match: {
+            $and: [{ oBidQuantity: { $gte: 1 } }, { oBidStatus: "Bid" }],
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            bidderID: 1,
+            owner: 1,
+            bidStatus: 1,
+            oBidPrice: 1,
+            nftID: 1,
+            orderID: 1,
+            oBidQuantity: 1,
+            buyerSignature: 1,
+            oBidDeadline: 1,
+          },
+        },
+        {
+          $lookup: {
+            from: "users",
+            localField: "bidderID",
+            foreignField: "_id",
+            as: "bidderID",
+          },
+        },
+        {
+          $sort: {
+            sCreated: -1,
+          },
+        },
+      ]);
+
+      console.log(getData);
 
       let data = await Bid.aggregate([
         {
           $match: {
-            $and: [
-              { oBidQuantity: { $gte: 1 } },
-              { bidStatus: "Bid" },
-              oTypeQuery,
-              nftIDQuery,
-              orderIDQuery,
-              buyerIDQuery,
-            ],
+            $and: [{ oBidQuantity: { $gte: 1 } }, { bidStatus: "Bid" }],
           },
         },
         {
@@ -193,6 +222,7 @@ module.exports = {
           },
         },
       ]);
+      
       console.log("Datat" + data[0].bids.length);
       let iFiltered = data[0].bids.length;
       if (data[0].totalCount[0] == undefined) {

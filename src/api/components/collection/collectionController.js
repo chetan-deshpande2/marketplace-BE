@@ -99,6 +99,19 @@ module.exports = {
           limit: limit,
         };
       }
+      //  let collection = await Collection.aggregate([ {
+      //   $match: {
+      //     oCreatedBy: mongoose.Types.ObjectId(req.userId),
+      //   },
+      // },   {
+      //   $lookup: {
+      //     from: "user",
+      //     localField: "oCreatedBy",
+      //     foreignField: "_id",
+      //     as: "oUser",
+      //   },
+      // },])
+      // console.log(collection)
 
       let aCollections = await Collection.aggregate([
         {
