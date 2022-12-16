@@ -4,6 +4,7 @@ import {
   updateProfile,
   addCollaborator,
   getUserProfilewithNfts,
+  getAddressById
 } from "./userController";
 import UserMiddleware from "../../middleware/middleware";
 
@@ -15,6 +16,8 @@ router.put("/updateProfile", UserMiddleware.verifyToken, updateProfile);
 router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
 
 router.post("/profileDetail", getUserProfilewithNfts);
+
+router.get('/getAddressById',getAddressById)
 //   router.post(
 //     "/collaboratorList",
 //     UserMiddleware.verifyToken,

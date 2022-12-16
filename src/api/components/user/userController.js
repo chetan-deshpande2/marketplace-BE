@@ -33,6 +33,19 @@ const pinata = new pinataSDK({
 });
 
 module.exports = {
+  getAddressById: async (req, res) => {
+    console.log(req.body);
+    let id = req.body.id;
+    try {
+      User.findById(id, (error, user) => {
+        if (error) return res.send(error);
+        console.log(user.sWalletAddress);
+      });
+    } catch (error) {
+      res.send(error);
+    }
+  },
+
   profile: async (req, res) => {
     try {
       User.findOne(
@@ -82,7 +95,6 @@ module.exports = {
 
       upload2("userProfile")(req, res, async (error) => {
         console.log("inside");
-
 
         console.log(req.file.originalname);
 
