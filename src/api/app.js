@@ -7,7 +7,6 @@ import "regenerator-runtime";
 import indexRouter from "./components";
 import path from "path";
 import session from "express-session";
-import flash from "connect-flash";
 const MemoryStore = require("memorystore")(session);
 
 const app = express();

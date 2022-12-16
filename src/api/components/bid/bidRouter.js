@@ -14,4 +14,4 @@ router.post("/updateBid", updateBid);
 router.post("/fetchBidNft", bidMiddleware.verifyToken, fetchBidNft);
 router.post("/acceptBidNft", acceptBidNft);
 
-module.exports = router;
+export default router;

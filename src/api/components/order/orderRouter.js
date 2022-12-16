@@ -20,4 +20,4 @@ router.delete("/deleteOrder", OrderMiddleware.verifyToken, deleteOrder);
 router.post("/getOrder", getOrder);
 router.post("/getOrdersByNftId", getOrdersByNftId);
 
-module.exports = router;
+export default router;

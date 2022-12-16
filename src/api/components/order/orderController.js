@@ -1,24 +1,9 @@
-import fs from "fs";
-import ipfsAPI from "ipfs-api";
+
 import mongoose from "mongoose";
-import multer from "multer";
-import pinataSDK from "@pinata/sdk";
-import jwt from "jsonwebtoken";
 
 import Order from "./orderModel";
 import NFT from "../nft/nftModel";
-import { result } from "lodash";
 
-const ipfs = ipfsAPI("ipfs.infura.io", "5001", {
-  protocol: "https",
-  auth: "21w11zfV67PHKlkAEYAZWoj2tsg:f2b73c626c9f1df9f698828420fa8439",
-});
-
-const pinata = new pinataSDK({
-  pinataApiKey: "3ea7991864f4a7d2f998",
-  pinataSecretApiKey:
-    "5988caf8173c5cc986978b9bfd48060622830025ce80cc167f3c58d56ae29dbf",
-});
 
 module.exports = {
   createOrder: async (req, res) => {
@@ -90,7 +75,7 @@ module.exports = {
             upsert: true,
           },
           (err) => {
-            if (err) throw error;
+            if (err) return res.send(err);
           }
         );
 

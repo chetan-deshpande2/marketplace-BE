@@ -1,3 +1,4 @@
+/* eslint-disable no-undef */
 import mongoose from "mongoose";
 import config from "../config/index";
 import logger from "../middleware/logger";

@@ -7,4 +7,4 @@ const router = express.Router();
 router.post("/insert", insertHistory);
 router.post("/fetchHistory", fetchHistory);
 
-module.exports = router;
+export default router

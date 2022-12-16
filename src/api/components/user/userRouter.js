@@ -57,4 +57,5 @@ router.post('/getAddressById',getAddressById)
 //     UserMiddleware.verifyWithoutToken,
 //     userController.getAllUserDetails
 //   );
-module.exports = router;
+ 
+export default router

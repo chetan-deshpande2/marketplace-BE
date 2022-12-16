@@ -5,4 +5,4 @@ import adminMiddleware from "../../middleware/middleware";
 const router = express.Router();
 router.post("/user", users);
 
-module.exports = router;
+export default router;

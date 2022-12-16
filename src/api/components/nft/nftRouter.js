@@ -68,4 +68,4 @@ router.post("/getHotCollections", getHotCollection);
 // router.post("/like", NFTmiddleware.verifyToken, nftController.likeNFT);
 // router.post("/getUserLikedNfts", nftController.getUserLikedNfts);
 
-module.exports = router;
+export default router

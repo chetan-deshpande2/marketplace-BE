@@ -3,8 +3,6 @@ import dotenv from "dotenv";
 import User from "./../user/userModel";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import crypto from "crypto";
-import { response } from "express";
 import { resolveSoa } from "dns";
 dotenv.config();
 

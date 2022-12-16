@@ -281,6 +281,14 @@ module.exports = {
             $and: [{ oBidQuantity: { $gte: 1 } }, { oBidStatus: "Bid" }],
           },
         },
+        {
+          $lookup: {
+            from: "nfts",
+            localField: "nftIDs",
+            foreignField: "_id",
+            as: "nft",
+          },
+        },
 
         // {
         //   $project: {
@@ -310,7 +318,6 @@ module.exports = {
         //   },
         // },
       ]);
-
 
       console.log(data);
 

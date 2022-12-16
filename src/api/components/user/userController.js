@@ -1,10 +1,6 @@
-import fs from "fs";
-import http from "http";
-import aws from "aws-sdk";
 import mongoose from "mongoose";
-import pinataSDK from "@pinata/sdk";
 import multer from "multer";
-import multerS3 from "multer-s3";
+
 
 import User from "./userModel";
 import NFT from "../nft/nftModel";
@@ -26,11 +22,6 @@ const storage3 = new GridFsStorage({
 
 const upload2 = multer({ dest: "images/files", storage3 });
 
-const pinata = new pinataSDK({
-  pinataApiKey: "3ea7991864f4a7d2f998",
-  pinataSecretApiKey:
-    "5988caf8173c5cc986978b9bfd48060622830025ce80cc167f3c58d56ae29dbf",
-});
 
 module.exports = {
   getAddressById: async (req, res) => {

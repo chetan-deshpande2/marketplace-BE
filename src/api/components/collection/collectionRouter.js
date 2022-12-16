@@ -46,4 +46,4 @@ router.post(
   updateCollectionToken
 );
 
-module.exports = router;
+export default router;
