@@ -311,7 +311,8 @@ module.exports = {
         // },
       ]);
 
-      console.log(data[0].bids);
+
+      console.log(data);
 
       // let data = await Bid.aggregate([
       //   {
@@ -383,7 +384,7 @@ module.exports = {
 
       return res.send({
         message: "Bid Details",
-        data: data[0],
+        data: data,
       });
     } catch (error) {
       res.send(error);
