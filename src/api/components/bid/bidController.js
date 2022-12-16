@@ -9,7 +9,7 @@ module.exports = {
   createBidNft: async (req, res) => {
     console.log(req.body);
     try {
-      // if (!req.userId) return res.send("Unauthorized user");
+      if (!req.userId) return res.send("Unauthorized user");
       console.log("Checking Old Bids");
       let checkBid = await Bid.findOne({
         oBidder: mongoose.Types.ObjectId(req.userId),
@@ -18,6 +18,7 @@ module.exports = {
         oOrderId: mongoose.Types.ObjectId(req.body.oOrderId),
         oBidStatus: "Bid",
       });
+
       if (checkBid) {
         await Bid.findOneAndDelete(
           {
@@ -60,6 +61,7 @@ module.exports = {
       res.send(error);
     }
   },
+
   updateBid: async (req, res) => {
     try {
       console.log("Checking Old Bids");
@@ -102,150 +104,292 @@ module.exports = {
     }
   },
 
+  // fetchBidNft: async (req, res) => {
+  //   try {
+  //     if (!req.userId) return res.send("unauthorized");
+  //     let nftID = req.body.nNFTId;
+  //     let orderID = req.body.orderID;
+  //     let buyerID = req.body.buyerID;
+  //     let bidStatus = req.body.bidStatus;
+  //     let oTypeQuery = {};
+  //     let onftIDQuery = {};
+  //     let oorderIDQuery = {};
+  //     let obuyerIDQuery = {};
+  //     let filters = [];
+  //     // if (bidStatus != "All") {
+  //     //   oTypeQuery = { oBidStatus: mongoose.Types.ObjectId(bidStatus) };
+  //     // }
+  //     // if (nftID != "All") {
+  //     //   onftIDQuery = { oNFTId: mongoose.Types.ObjectId(nftID) };
+  //     // }
+  //     // if (orderID != "All") {
+  //     //   oorderIDQuery = { oOrderId: mongoose.Types.ObjectId(orderID) };
+  //     // }
+  //     // if (buyerID != "All") {
+  //     //   obuyerIDQuery = { oBidder: mongoose.Types.ObjectId(buyerID) };
+  //     // }
+
+  //     let getData = await Bid.aggregate([
+  //       {
+  //         $match: {
+  //           $and: [{ oBidQuantity: { $gte: 1 } }, { oBidStatus: "Bid" }],
+  //         },
+  //       },
+  //       {
+  //         $project: {
+  //           _id: 1,
+  //           bidderID: 1,
+  //           owner: 1,
+  //           bidStatus: 1,
+  //           oBidPrice: 1,
+  //           nftID: 1,
+  //           orderID: 1,
+  //           oBidQuantity: 1,
+  //           buyerSignature: 1,
+  //           oBidDeadline: 1,
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: "users",
+  //           localField: "bidderID",
+  //           foreignField: "_id",
+  //           as: "bidderID",
+  //         },
+  //       },
+  //       {
+  //         $sort: {
+  //           sCreated: -1,
+  //         },
+  //       },
+  //     ]);
+
+  //     console.log(getData);
+
+  //     let data = await Bid.aggregate([
+  //       {
+  //         $match: {
+  //           $and: [{ oBidQuantity: { $gte: 1 } }, { bidStatus: "Bid" }],
+  //         },
+  //       },
+  //       {
+  //         $project: {
+  //           _id: 1,
+  //           bidderID: 1,
+  //           owner: 1,
+  //           bidStatus: 1,
+  //           oBidPrice: 1,
+  //           nftID: 1,
+  //           orderID: 1,
+  //           oBidQuantity: 1,
+  //           buyerSignature: 1,
+  //           oBidDeadline: 1,
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: "users",
+  //           localField: "bidderID",
+  //           foreignField: "_id",
+  //           as: "bidderID",
+  //         },
+  //       },
+  //       {
+  //         $lookup: {
+  //           from: "users",
+  //           localField: "owner",
+  //           foreignField: "_id",
+  //           as: "owner",
+  //         },
+  //       },
+  //       {
+  //         $sort: {
+  //           sCreated: -1,
+  //         },
+  //       },
+  //       { $unwind: "$bidderID" },
+  //       { $unwind: "$owner" },
+  //       {
+  //         $facet: {
+  //           bids: [
+  //             {
+  //               $skip: +0,
+  //             },
+  //           ],
+  //           totalCount: [
+  //             {
+  //               $count: "count",
+  //             },
+  //           ],
+  //         },
+  //       },
+  //     ]);
+
+  //     console.log("Datat" + data[0].bids.length);
+  //     let iFiltered = data[0].bids.length;
+  //     if (data[0].totalCount[0] == undefined) {
+  //       return res.send({
+  //         message: "Bid Details",
+  //         data: [],
+  //         draw: req.body.draw,
+  //         recordsTotal: 0,
+  //         recordsFiltered: 0,
+  //       });
+  //     } else {
+  //       return res.send({
+  //         message: "Bid Details",
+  //         data: data[0].bids,
+  //         draw: req.body.draw,
+  //         recordsTotal: data[0].totalCount[0].count,
+  //         recordsFiltered: iFiltered,
+  //       });
+  //     }
+  //   } catch (error) {
+  //     res.send(error);
+  //   }
+  // },
+
   fetchBidNft: async (req, res) => {
     try {
-      if (!req.userId) return res.send("unauthorized");
-      let nftID = req.body.nNFTId;
+      if (!req.userId) return res.send("Unauthorized Access");
+      let nftID = req.body.nftID;
       let orderID = req.body.orderID;
       let buyerID = req.body.buyerID;
       let bidStatus = req.body.bidStatus;
       let oTypeQuery = {};
-      let onftIDQuery = {};
-      let oorderIDQuery = {};
-      let obuyerIDQuery = {};
-      let filters = [];
-      // if (bidStatus != "All") {
-      //   oTypeQuery = { oBidStatus: mongoose.Types.ObjectId(bidStatus) };
-      // }
-      // if (nftID != "All") {
-      //   onftIDQuery = { oNFTId: mongoose.Types.ObjectId(nftID) };
-      // }
-      // if (orderID != "All") {
-      //   oorderIDQuery = { oOrderId: mongoose.Types.ObjectId(orderID) };
-      // }
-      // if (buyerID != "All") {
-      //   obuyerIDQuery = { oBidder: mongoose.Types.ObjectId(buyerID) };
-      // }
+      let nftIDQuery = {};
+      let orderIDQuery = {};
+      let buyerIDQuery = {};
 
-      let getData = await Bid.aggregate([
+      let filters = [];
+      if (bidStatus != "All") {
+        oTypeQuery = { bidStatus: mongoose.Types.ObjectId(bidStatus) };
+      }
+      if (nftID != "All") {
+        nftIDQuery = { nftID: mongoose.Types.ObjectId(nftID) };
+      }
+      if (orderID != "All") {
+        orderIDQuery = { orderID: mongoose.Types.ObjectId(orderID) };
+      }
+      if (buyerID != "All") {
+        buyerIDQuery = { bidderID: mongoose.Types.ObjectId(buyerID) };
+      }
+      console.log(filters);
+      let data = await Bid.aggregate([
         {
           $match: {
             $and: [{ oBidQuantity: { $gte: 1 } }, { oBidStatus: "Bid" }],
           },
         },
-        {
-          $project: {
-            _id: 1,
-            bidderID: 1,
-            owner: 1,
-            bidStatus: 1,
-            oBidPrice: 1,
-            nftID: 1,
-            orderID: 1,
-            oBidQuantity: 1,
-            buyerSignature: 1,
-            oBidDeadline: 1,
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "bidderID",
-            foreignField: "_id",
-            as: "bidderID",
-          },
-        },
-        {
-          $sort: {
-            sCreated: -1,
-          },
-        },
+
+        // {
+        //   $project: {
+        //     _id: 1,
+        //     bidderID: 1,
+        //     owner: 1,
+        //     bidStatus: 1,
+        //     oBidPrice: 1,
+        //     nftID: 1,
+        //     orderID: 1,
+        //     oBidQuantity: 1,
+        //     buyerSignature: 1,
+        //     oBidDeadline: 1,
+        //   },
+        // },
+        // {
+        //   $lookup: {
+        //     from: "users",
+        //     localField: "bidderID",
+        //     foreignField: "_id",
+        //     as: "bidderID",
+        //   },
+        // },
+        // {
+        //   $sort: {
+        //     sCreated: -1,
+        //   },
+        // },
       ]);
 
-      console.log(getData);
+      console.log(data[0].bids);
 
-      let data = await Bid.aggregate([
-        {
-          $match: {
-            $and: [{ oBidQuantity: { $gte: 1 } }, { bidStatus: "Bid" }],
-          },
-        },
-        {
-          $project: {
-            _id: 1,
-            bidderID: 1,
-            owner: 1,
-            bidStatus: 1,
-            oBidPrice: 1,
-            nftID: 1,
-            orderID: 1,
-            oBidQuantity: 1,
-            buyerSignature: 1,
-            oBidDeadline: 1,
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "bidderID",
-            foreignField: "_id",
-            as: "bidderID",
-          },
-        },
-        {
-          $lookup: {
-            from: "users",
-            localField: "owner",
-            foreignField: "_id",
-            as: "owner",
-          },
-        },
-        {
-          $sort: {
-            sCreated: -1,
-          },
-        },
-        { $unwind: "$bidderID" },
-        { $unwind: "$owner" },
-        {
-          $facet: {
-            bids: [
-              {
-                $skip: +0,
-              },
-            ],
-            totalCount: [
-              {
-                $count: "count",
-              },
-            ],
-          },
-        },
-      ]);
-      
-      console.log("Datat" + data[0].bids.length);
-      let iFiltered = data[0].bids.length;
-      if (data[0].totalCount[0] == undefined) {
-        return res.send({
-          message: "Bid Details",
-          data: [],
-          draw: req.body.draw,
-          recordsTotal: 0,
-          recordsFiltered: 0,
-        });
-      } else {
-        return res.send({
-          message: "Bid Details",
-          data: data[0].bids,
-          draw: req.body.draw,
-          recordsTotal: data[0].totalCount[0].count,
-          recordsFiltered: iFiltered,
-        });
-      }
+      // let data = await Bid.aggregate([
+      //   {
+      //     $match: {
+      //       $and: [
+      //         { oBidQuantity: { $gte: 1 } },
+      //         { bidStatus: "Bid" },
+      //         oTypeQuery,
+      //         nftIDQuery,
+      //         orderIDQuery,
+      //         buyerIDQuery,
+      //       ],
+      //     },
+      //   },
+      //   {
+      //     $project: {
+      //       _id: 1,
+      //       bidderID: 1,
+      //       owner: 1,
+      //       bidStatus: 1,
+      //       oBidPrice: 1,
+      //       nftID: 1,
+      //       orderID: 1,
+      //       oBidQuantity: 1,
+      //       buyerSignature: 1,
+      //       oBidDeadline: 1,
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "users",
+      //       localField: "bidderID",
+      //       foreignField: "_id",
+      //       as: "bidderID",
+      //     },
+      //   },
+      //   {
+      //     $lookup: {
+      //       from: "users",
+      //       localField: "owner",
+      //       foreignField: "_id",
+      //       as: "owner",
+      //     },
+      //   },
+      //   {
+      //     $sort: {
+      //       sCreated: -1,
+      //     },
+      //   },
+      //   { $unwind: "$bidderID" },
+      //   { $unwind: "$owner" },
+      //   {
+      //     $facet: {
+      //       bids: [
+      //         {
+      //           $skip: +0,
+      //         },
+      //       ],
+      //       totalCount: [
+      //         {
+      //           $count: "count",
+      //         },
+      //       ],
+      //     },
+      //   },
+      // ]);
+
+      console.log("Datat" + data[0]);
+
+      return res.send({
+        message: "Bid Details",
+        data: data[0],
+      });
     } catch (error) {
       res.send(error);
     }
   },
+
   acceptBidNft: async (req, res) => {
     console.log(req.body);
     try {
