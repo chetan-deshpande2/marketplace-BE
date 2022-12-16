@@ -17,7 +17,7 @@ router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
 
 router.post("/profileDetail", getUserProfilewithNfts);
 
-router.get('/getAddressById',getAddressById)
+router.post('/getAddressById',getAddressById)
 //   router.post(
 //     "/collaboratorList",
 //     UserMiddleware.verifyToken,

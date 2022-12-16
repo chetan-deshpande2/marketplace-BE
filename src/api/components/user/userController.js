@@ -34,12 +34,13 @@ const pinata = new pinataSDK({
 
 module.exports = {
   getAddressById: async (req, res) => {
-    console.log(req.body);
-    let id = req.body.id;
+    console.log(req.body.sellerId);
+    let id = req.body.sellerId;
     try {
       User.findById(id, (error, user) => {
         if (error) return res.send(error);
         console.log(user.sWalletAddress);
+        res.send({ message: "User Address", userAddress: user.sWalletAddress });
       });
     } catch (error) {
       res.send(error);
