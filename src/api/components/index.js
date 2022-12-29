@@ -12,12 +12,12 @@ import adminRouter from './admin/adminRouter.js';
 import authRouter from './auth/authRouter.js';
 
 router.use('/nft', nftRouter);
-// router.use("/collection", collectionRouter);
-// router.use("/bid", bidRouter);
-// router.use("/order", orderRouter);
-// router.use("/history", historyRouter);
-// router.use("/user", userRouter);
-// router.use("/admin", adminRouter);
-// router.use("/auth", authRouter);
+router.use('/collection', collectionRouter);
+router.use('/bid', bidRouter);
+router.use('/order', orderRouter);
+router.use('/history', historyRouter);
+router.use('/user', userRouter);
+router.use('/admin', adminRouter);
+router.use('/auth', authRouter);
 
 export default router;
