@@ -1,11 +1,10 @@
-import express from "express";
+import express from 'express';
 
 const router = express.Router();
 
 import {
   createCollection,
   collectionList,
-  uploadCollection,
   getCollectionDetailsByAddress,
   getCollectionDetails,
   getCollections,
@@ -14,35 +13,35 @@ import {
   getCollectionNFTOwned,
   getSearchedNFT,
   updateCollectionToken,
-} from "./collectionController";
-import NFTmiddleware from "../../middleware/middleware";
+} from './collectionController.js';
+import {
+  verifyToken,
+  verifyWithoutToken,
+  proceedWithoutToken,
+} from '../../middleware/middleware.js';
 
-router.post("/createCollection", NFTmiddleware.verifyToken, createCollection);
-router.get("/collectionList", NFTmiddleware.verifyToken, collectionList);
+router.post('/createCollection', verifyToken, createCollection);
+router.get('/collectionList', verifyToken, collectionList);
 
 router.post(
-  "/getCollectionDetailsById",
-  NFTmiddleware.verifyWithoutToken,
+  '/getCollectionDetailsById',
+  verifyWithoutToken,
   getCollectionDetails
 );
 
-router.post("/getCollectionDetailsByAddress", getCollectionDetailsByAddress);
-router.get("/myCollectionList", NFTmiddleware.verifyToken, userCollectionList);
+router.post('/getCollectionDetailsByAddress', getCollectionDetailsByAddress);
+router.get('/myCollectionList', verifyToken, userCollectionList);
 
-router.get("/getcollections", NFTmiddleware.verifyToken, getCollections);
+router.get('/getcollections', verifyToken, getCollections);
 
-router.post("/getCollectionNFT", getCollectionNFT);
+router.post('/getCollectionNFT', getCollectionNFT);
 
-router.post(
-  "/getCollectionNFTOwned",
-  NFTmiddleware.verifyToken,
-  getCollectionNFTOwned
-);
-router.post("/getSearchedNft", getSearchedNFT);
+router.post('/getCollectionNFTOwned', verifyToken, getCollectionNFTOwned);
+router.post('/getSearchedNft', getSearchedNFT);
 
 router.post(
-  "/updateCollectionToken/:collectionAddress",
-  NFTmiddleware.verifyToken,
+  '/updateCollectionToken/:collectionAddress',
+  verifyToken,
   updateCollectionToken
 );
 

@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 import {
   create,
   myNFTList,
@@ -19,53 +19,46 @@ import {
   getSearchedNft,
   updateNFTDeatils,
   getHotCollection,
-} from "./nftController";
-import NFTmiddleware from "../../middleware/middleware";
+} from './nftController.js';
+import {
+  verifyToken,
+  verifyWithoutToken,
+  proceedWithoutToken,
+} from '../../middleware/middleware.js';
 
 const router = express.Router();
 
-router.post("/create", NFTmiddleware.verifyToken, create);
+router.post('/create', create);
 
-router.post("/myNFTList", NFTmiddleware.verifyWithoutToken, myNFTList);
-router.get("/viewnft/:nNFTId", nftID);
-router.post("/nftListing", NFTmiddleware.verifyWithoutToken, nftListing);
+router.post('/myNFTList', verifyWithoutToken, myNFTList);
+router.get('/viewnft/:nNFTId', nftID);
+router.post('/nftListing', verifyWithoutToken, nftListing);
 
-router.get(
-  "/viewnftOwner/:nNFTId",
-  NFTmiddleware.verifyWithoutToken,
-  getNFTOwner
-);
-router.get(
-  "/getAllnftOwner/:nNFTId",
-  NFTmiddleware.verifyWithoutToken,
-  getAllNFTOwner
-);
-router.get("/deleteNFT/:nNFTId", NFTmiddleware.verifyToken, deleteNFT);
+router.get('/viewnftOwner/:nNFTId', verifyWithoutToken, getNFTOwner);
+router.get('/getAllnftOwner/:nNFTId', verifyWithoutToken, getAllNFTOwner);
+router.get('/deleteNFT/:nNFTId', verifyToken, deleteNFT);
 
-router.put("/updateBasePrice", NFTmiddleware.verifyToken, updateBasePrice);
+router.put('/updateBasePrice', verifyToken, updateBasePrice);
 
-router.put("/setNFTOrder", NFTmiddleware.verifyToken, setNFTOrder);
-router.post("/updateNFTDeatils", updateNFTDeatils);
+router.put('/setNFTOrder', verifyToken, setNFTOrder);
+router.post('/updateNFTDeatils', updateNFTDeatils);
 
-router.post(
-  "/getOnSaleItems",
-  NFTmiddleware.verifyWithoutToken,
-  getOnSaleItems
-);
+router.post('/getOnSaleItems', verifyWithoutToken, getOnSaleItems);
 
-router.put("/toggleSellingType", NFTmiddleware.verifyToken, toggleSellingType);
-router.post("/uploadImage", NFTmiddleware.verifyToken, uploadImage);
+router.put('/toggleSellingType', verifyToken, toggleSellingType);
+router.post('/uploadImage', verifyToken, uploadImage);
 
-router.get("/getAllNfts", getAllNFTs);
-router.post("/getOwnedNFTList", getOwnedNFTList);
+router.get('/getAllNfts', getAllNFTs);
+router.post('/getOwnedNFTList', getOwnedNFTList);
 
-router.post("/getUserOnSaleNfts", getUserOnSaleNfts);
-router.put("/transferNfts", NFTmiddleware.verifyToken, transferNfts);
-router.post("/getSearchedNft", getSearchedNft);
-router.post("/getHotCollections", getHotCollection);
-// router.post("/createNFT", createNFT);
+router.post('/getUserOnSaleNfts', getUserOnSaleNfts);
+router.put('/transferNfts', verifyToken, transferNfts);
+router.post('/getSearchedNft', getSearchedNft);
+router.post('/getHotCollections', getHotCollection);
 
-// router.post("/like", NFTmiddleware.verifyToken, nftController.likeNFT);
-// router.post("/getUserLikedNfts", nftController.getUserLikedNfts);
+// router.post('/createNFT', createNFT);
 
-export default router
+// router.post('/like', verifyToken, nftController.likeNFT);
+// router.post('/getUserLikedNfts', nftController.getUserLikedNfts);
+
+export default router;

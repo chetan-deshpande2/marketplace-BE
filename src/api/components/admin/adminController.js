@@ -1,7 +1,7 @@
 import fs from 'fs';
 import multer from 'multer';
-import User from '../user/userModel';
-import NFT from '../nft/nftModel';
+import User from '../user/userModel.js';
+import NFT from '../nft/nftModel.js';
 
 const storage = multer.diskStorage({
   destination: (req, file, callback) => {

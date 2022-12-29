@@ -1,9 +1,9 @@
 import mongoose from 'mongoose';
 
-import Bid from './bidModel';
-import User from '../user/userModel';
-import NFT from '../nft/nftModel';
-import Order from '../order/orderModel';
+import Bid from './bidModel.js';
+import User from '../user/userModel.js';
+import NFT from '../nft/nftModel.js';
+import Order from '../order/orderModel.js';
 
 const createBidNft = async (req, res) => {
   console.log(req.body);

@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 
 const userSchema = mongoose.Schema({
   sWalletAddress: {
@@ -9,7 +9,7 @@ const userSchema = mongoose.Schema({
   },
   sUserName: {
     type: String,
-    default: "",
+    default: '',
   },
   sEmail: {
     type: String,
@@ -20,8 +20,8 @@ const userSchema = mongoose.Schema({
   },
   sRole: {
     type: String,
-    enum: ["user", "admin"],
-    default: "user",
+    enum: ['user', 'admin'],
+    default: 'user',
   },
   sCreated: {
     type: Date,
@@ -42,4 +42,4 @@ const userSchema = mongoose.Schema({
   user_followers_size: { type: Number, default: 0 },
 });
 // userSchema.set( 'toJSON', { getters: true } )
-export default db.model("User", userSchema);
+export default db.model('User', userSchema);

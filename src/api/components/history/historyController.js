@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-import History from './historyModel';
+import History from './historyModel.js';
 
 const insertHistory = async (req, res) => {
   try {

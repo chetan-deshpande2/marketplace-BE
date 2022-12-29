@@ -1,18 +1,18 @@
-import mongoose from "mongoose";
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 
 const bidSchema = new mongoose.Schema({
   oBidder: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   oOwner: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   oBidStatus: {
     type: String,
-    enum: ["Bid", "Cancelled", "Accepted", "Sold", "Rejected"],
+    enum: ['Bid', 'Cancelled', 'Accepted', 'Sold', 'Rejected'],
   },
   oBidPrice: {
     type: mongoose.Types.Decimal128,
@@ -20,11 +20,11 @@ const bidSchema = new mongoose.Schema({
   },
   oNFTId: {
     type: mongoose.Schema.ObjectId,
-    ref: "NFT",
+    ref: 'NFT',
   },
   oOrderId: {
     type: mongoose.Schema.ObjectId,
-    ref: "Order",
+    ref: 'Order',
   },
   sCreated: {
     type: Date,
@@ -35,4 +35,4 @@ const bidSchema = new mongoose.Schema({
   oBuyerSignature: Array,
 });
 
-export default db.model("Bid", bidSchema);
+export default db.model('Bid', bidSchema);

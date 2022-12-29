@@ -1,10 +1,10 @@
-import mongoose from "mongoose";
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 
 const nftOwnerSchema = mongoose.Schema({
   nftId: {
     type: mongoose.Schema.ObjectId,
-    ref: "Nft",
+    ref: 'Nft',
   },
   sCreated: {
     type: Date,
@@ -12,7 +12,7 @@ const nftOwnerSchema = mongoose.Schema({
   },
   oCurrentOwner: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   sOrder: Array,
   sSignature: Array,
@@ -21,7 +21,7 @@ const nftOwnerSchema = mongoose.Schema({
   nBasePrice: mongoose.Types.Decimal128,
   eAuctionType: {
     type: String,
-    enum: ["Auction", "Fixed Sale", "Unlockable"],
+    enum: ['Auction', 'Fixed Sale', 'Unlockable'],
   },
   sTransactionStatus: {
     type: Number,
@@ -35,4 +35,4 @@ const nftOwnerSchema = mongoose.Schema({
   auction_end_date: { type: Date },
 });
 
-export default db.model("NFTowners", nftOwnerSchema);
+export default db.model('NFTowners', nftOwnerSchema);

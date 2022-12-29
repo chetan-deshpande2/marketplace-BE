@@ -1,9 +1,8 @@
 import dotenv from 'dotenv';
-
-import User from './../user/userModel';
 import bcrypt from 'bcrypt';
 import jwt from 'jsonwebtoken';
-import { resolveSoa } from 'dns';
+import User from './../user/userModel.js';
+
 dotenv.config();
 
 const saltRounds = 10;
@@ -106,7 +105,7 @@ const checkUserAddress = async (req, res) => {
 };
 const Logout = async (req, res) => {
   try {
-    if (!req.userId) return resolveSoa.send('unauthorized');
+    if (!req.userId) return res.send('unauthorized');
     console.log('User Id', req.userId);
     User.findOne(
       {

@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 
 const nftSchema = mongoose.Schema({
   nHash: {
@@ -12,10 +12,10 @@ const nftSchema = mongoose.Schema({
   },
   nCreater: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
     // require: true,
   },
-  nOrders: [{ type: mongoose.Schema.ObjectId, ref: "Order" }],
+  nOrders: [{ type: mongoose.Schema.ObjectId, ref: 'Order' }],
   nCollection: String,
   nTitle: String,
   nCollaborator: Array,
@@ -66,4 +66,4 @@ const nftSchema = mongoose.Schema({
   },
 });
 
-export default db.model("NFT", nftSchema);
+export default db.model('NFT', nftSchema);

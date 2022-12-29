@@ -1,5 +1,5 @@
-import mongoose from "mongoose";
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 const collectionSchema = mongoose.Schema({
   sHash: {
     type: String,
@@ -28,7 +28,7 @@ const collectionSchema = mongoose.Schema({
   },
   oCreatedBy: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   sRoyaltyPercentage: Number,
   sName: String,
@@ -41,4 +41,4 @@ collectionSchema.methods.getNextId = function () {
   return nextIddd;
 };
 
-export default db.model("Collection", collectionSchema);
+export default db.model('Collection', collectionSchema);

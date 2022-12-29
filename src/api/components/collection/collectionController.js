@@ -2,7 +2,6 @@ import fs from 'fs';
 import http from 'http';
 import aws from 'aws-sdk';
 import mongoose from 'mongoose';
-
 import multer from 'multer';
 import multerS3 from 'multer-s3';
 import minimist from 'minimist';
@@ -10,9 +9,8 @@ import { Web3Storage, getFilesFromPath } from 'web3.storage';
 import { GridFsStorage } from 'multer-gridfs-storage';
 import util from 'util';
 import path from 'path';
-import logger from '../../middleware/logger';
 
-import Collection from './collectionModel';
+import Collection from './collectionModel.js';
 
 const storage3 = new GridFsStorage({
   url: process.env.MONGODB_URL,

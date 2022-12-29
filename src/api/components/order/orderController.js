@@ -1,7 +1,7 @@
 import mongoose from 'mongoose';
 
-import Order from './orderModel';
-import NFT from '../nft/nftModel';
+import Order from './orderModel.js';
+import NFT from '../nft/nftModel.js';
 
 const createOrder = async (req, res) => {
   try {

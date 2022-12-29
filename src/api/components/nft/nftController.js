@@ -6,16 +6,13 @@ import mongoose from 'mongoose';
 import pinataSDK from '@pinata/sdk';
 import multer from 'multer';
 import jwt from 'jsonwebtoken';
-
-import NFT from './nftModel';
-import NFTowners from './nftOwnerModel';
-import Order from '../order/orderModel';
-
 import { GridFsStorage } from 'multer-gridfs-storage';
-
-import Collection from '../collection/collectionModel';
 import multerS3 from 'multer-s3';
-import { setTimeout } from 'timers';
+
+import NFT from './nftModel.js';
+import NFTowners from './nftOwnerModel.js';
+import Order from '../order/orderModel.js';
+import Collection from '../collection/collectionModel.js';
 
 const spacesEndpoint = new aws.Endpoint('sgp1.digitaloceanspaces.com');
 const s3 = new aws.S3({
@@ -51,14 +48,6 @@ let fileFilter = function (req, file, cb) {
   }
 };
 
-let oMulterObj = {
-  storage: storage1,
-  limits: {
-    fileSize: 15 * 1024 * 1024, // 15mb
-  },
-  fileFilter: fileFilter,
-};
-
 const storage1 = multer.diskStorage({
   destination: (req, file, cb) => {
     cb(null, 'uploads');
@@ -69,6 +58,15 @@ const storage1 = multer.diskStorage({
     cb(null, `${uuid()}-${originalname}`);
   },
 });
+
+let oMulterObj = {
+  storage: storage1,
+  limits: {
+    fileSize: 15 * 1024 * 1024, // 15mb
+  },
+  fileFilter: fileFilter,
+};
+
 
 const upload = multer(oMulterObj);
 const uploadBanner = multer(oMulterObj);

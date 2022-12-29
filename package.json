@@ -2,7 +2,7 @@
   "name": "ln-marketplace",
   "version": "1.0.0",
   "description": "",
-  "main": "app.js",
+  "type": "module",
   "scripts": {
     "start": "npm ./src/api/bin/www --exec babel-node --presets @babel/preset-env",
     "start:dev": "npm run build && npm run pm2:start && npm run pm2:start-cron",
@@ -11,7 +11,8 @@
     "build-prod": "npm run build && babel ./lib -d dist --copy-files",
     "prod": "npm run build-prod && node --max-old-space-size=4096 dist/api/bin/www",
     "dev": "nodemon ./src/api/bin/www --exec babel-node --presets @babel/preset-env",
-    "remove": "rm -rf dist lib"
+    "remove": "rm -rf dist lib",
+    "publish-dev": "node ./src/api/bin/www"
   },
   "repository": {
     "type": "git",

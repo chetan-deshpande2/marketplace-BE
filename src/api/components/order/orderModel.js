@@ -1,5 +1,5 @@
-const mongoose = require("mongoose");
-import db from "../../connections/db";
+import mongoose from 'mongoose';
+import db from '../../connections/db.js';
 
 const orderSchema = mongoose.Schema({
   oSellerWalletAddress: String, //walletADDRESS OF Seller
@@ -23,7 +23,7 @@ const orderSchema = mongoose.Schema({
   oSalt: Number,
   oNftId: {
     type: mongoose.Schema.ObjectId,
-    ref: "NFT",
+    ref: 'NFT',
   },
   oCreated: {
     type: Date,
@@ -31,7 +31,7 @@ const orderSchema = mongoose.Schema({
   },
   oSeller: {
     type: mongoose.Schema.ObjectId,
-    ref: "User",
+    ref: 'User',
   },
   oSignature: Array,
   auction_end_date: { type: Date },
@@ -47,4 +47,4 @@ const orderSchema = mongoose.Schema({
   quantity_sold: { type: Number, default: 0 },
 });
 
-export default db.model("Order", orderSchema);
+export default db.model('Order', orderSchema);

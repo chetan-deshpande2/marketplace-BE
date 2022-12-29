@@ -1,4 +1,4 @@
-import express from "express";
+import express from 'express';
 
 import {
   createOrder,
@@ -6,18 +6,22 @@ import {
   deleteOrder,
   getOrder,
   getOrdersByNftId,
-} from "./orderController";
-import OrderMiddleware from "../../middleware/middleware";
+} from './orderController.js';
+import {
+  verifyToken,
+  verifyWithoutToken,
+  proceedWithoutToken,
+} from '../../middleware/middleware.js';
 
 const router = express.Router();
 
-router.post("/createOrder", OrderMiddleware.verifyToken, createOrder);
+router.post('/createOrder', verifyToken, createOrder);
 
-router.put("/updateOrder", OrderMiddleware.verifyToken, updateOrder);
+router.put('/updateOrder', verifyToken, updateOrder);
 
-router.delete("/deleteOrder", OrderMiddleware.verifyToken, deleteOrder);
+router.delete('/deleteOrder', verifyToken, deleteOrder);
 
-router.post("/getOrder", getOrder);
-router.post("/getOrdersByNftId", getOrdersByNftId);
+router.post('/getOrder', getOrder);
+router.post('/getOrdersByNftId', getOrdersByNftId);
 
 export default router;

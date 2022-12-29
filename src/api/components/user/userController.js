@@ -1,10 +1,10 @@
 import mongoose from 'mongoose';
 import multer from 'multer';
-
-import User from './userModel';
-import NFT from '../nft/nftModel';
 import { Web3Storage, getFilesFromPath } from 'web3.storage';
 import { GridFsStorage } from 'multer-gridfs-storage';
+
+import User from './userModel.js';
+import NFT from '../nft/nftModel.js';
 
 const storage3 = new GridFsStorage({
   url: process.env.MONGODB_URL,

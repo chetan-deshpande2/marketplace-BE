@@ -1,23 +1,27 @@
-import express from "express";
+import express from 'express';
 import {
   profile,
   updateProfile,
   addCollaborator,
   getUserProfilewithNfts,
-  getAddressById
-} from "./userController";
-import UserMiddleware from "../../middleware/middleware";
+  getAddressById,
+} from './userController.js';
+import {
+  verifyToken,
+  verifyWithoutToken,
+  proceedWithoutToken,
+} from '../../middleware/middleware.js';
 
 const router = express.Router();
 
-router.get("/profile", UserMiddleware.verifyToken, profile);
-router.put("/updateProfile", UserMiddleware.verifyToken, updateProfile);
+router.get('/profile', verifyToken, profile);
+router.put('/updateProfile', verifyToken, updateProfile);
 
-router.post("/addCollaborator", UserMiddleware.verifyToken, addCollaborator);
+router.post('/addCollaborator', verifyToken, addCollaborator);
 
-router.post("/profileDetail", getUserProfilewithNfts);
+router.post('/profileDetail', getUserProfilewithNfts);
 
-router.post('/getAddressById',getAddressById)
+router.post('/getAddressById', getAddressById);
 //   router.post(
 //     "/collaboratorList",
 //     UserMiddleware.verifyToken,
@@ -57,5 +61,5 @@ router.post('/getAddressById',getAddressById)
 //     UserMiddleware.verifyWithoutToken,
 //     userController.getAllUserDetails
 //   );
- 
-export default router
+
+export default router;
