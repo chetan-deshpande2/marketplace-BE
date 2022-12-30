@@ -4,19 +4,9 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "node ./src/api/bin/www",
-    "start:dev": "npm run build && npm run pm2:start && npm run pm2:start-cron",
-    "start_bkp": "npm run build && node lib/api/bin/www --exec babel-node",
-    "build": "npm run remove && babel ./src --out-dir lib --copy-files",
-    "build-prod": "npm run build && babel ./lib -d dist --copy-files",
-    "prod": "npm run build-prod && node --max-old-space-size=4096 dist/api/bin/www",
-    "dev": "nodemon ./src/api/bin/www --exec babel-node --presets @babel/preset-env",
-    "remove": "rm -rf dist lib",
-    "publish-dev": "node www.js "
-  },
-  "repository": {
-    "type": "git",
-    "url": "rwar"
+    "start": "node www.js",
+    "dev": "nodemon www.js",
+    "remove": "rm -rf dist lib"
   },
   "author": "",
   "license": "ISC",
