@@ -1,4 +1,5 @@
 import express, { json, urlencoded } from 'express';
+import http from 'http';
 import cookieParser from 'cookie-parser';
 import logger from 'morgan';
 import cors from 'cors';
@@ -18,4 +19,17 @@ app.use(urlencoded({ extended: false }));
 
 app.use('/api/v1', indexRouter);
 
-export default app;
+const server = http.createServer(app);
+
+const port = process.env.PORT || '3000';
+app.set('port', port);
+
+function onListening() {
+  const addr = server.address();
+  const bind = typeof addr === 'string' ? `pipe ${addr}` : `port ${addr.port}`;
+}
+
+server.listen(port);
+console.info(`Server has started on ${port}`);
+
+server.on('listening', onListening);

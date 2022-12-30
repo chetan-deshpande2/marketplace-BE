@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "start": "node www.js",
-    "dev": "nodemon www.js",
+    "dev": "nodemon app.js",
     "remove": "rm -rf dist lib"
   },
   "author": "",
@@ -42,8 +42,6 @@
     "file-type": "^17.1.6",
     "http-errors": "^1.7.2",
     "image-url-validator": "^1.0.4",
-    "ipfs": "^0.63.5",
-    "ipfs-api": "^26.1.2",
     "is-image-url": "^1.1.8",
     "joi": "^17.4.2",
     "jsonwebtoken": "^8.5.1",
