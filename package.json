@@ -12,7 +12,7 @@
     "prod": "npm run build-prod && node --max-old-space-size=4096 dist/api/bin/www",
     "dev": "nodemon ./src/api/bin/www --exec babel-node --presets @babel/preset-env",
     "remove": "rm -rf dist lib",
-    "publish-dev": "node ./src/api/bin/www"
+    "publish-dev": "node ./src/api/bin/www.js"
   },
   "repository": {
     "type": "git",
