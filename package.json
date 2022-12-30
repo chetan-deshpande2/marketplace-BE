@@ -113,6 +113,9 @@
     "prettier-plugin-solidity": "^1.0.0-beta.18",
     "pretty-quick": "^2.0.1"
   },
+  "engines": {
+    "node": ">=16.0.0"
+  },
   "husky": {
     "hooks": {
       "pre-commit-do-not-run": "lint-staged"
