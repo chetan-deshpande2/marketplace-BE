@@ -112,7 +112,6 @@ const Logout = async (req, res) => {
         _id: req.userId,
       },
       (err, user) => {
-        req.session.destroy();
         if (err) return res.send('server error');
         if (!user) return res.send('user not found');
         return res.send({ message: 'Logout', auth: false, token: null });
