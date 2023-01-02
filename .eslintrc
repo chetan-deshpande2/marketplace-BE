@@ -1,6 +1,6 @@
-{
-  "extends": ["wesbos"],
-  "rules": {
-    "no-console": 2
-  }
-}
+// {
+//   "extends": ["wesbos"],
+//   "rules": {
+//     "no-console": 2
+//   }
+// }

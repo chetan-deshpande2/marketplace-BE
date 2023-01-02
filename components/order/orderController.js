@@ -37,7 +37,7 @@ const createOrder = async (req, res) => {
 };
 const deleteOrder = async (req, res) => {
   try {
-    if (!req.userId) return console.log('Unauthorized');
+    if (!req.userId) return res.send("Unauthorized");
     await Order.find({ _id: req.body.orderId }).remove().exec();
     await Bid.find({ oOrderId: req.body.orderId, oBidStatus: 'Bid' })
       .remove()

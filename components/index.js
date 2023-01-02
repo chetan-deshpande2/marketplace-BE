@@ -1,7 +1,5 @@
 import express from 'express';
 
-const router = express.Router();
-
 import nftRouter from './nft/nftRouter.js';
 import collectionRouter from './collection/collectionRouter.js';
 import bidRouter from './bid/bidRouter.js';
@@ -10,6 +8,8 @@ import historyRouter from './history/historyRouter.js';
 import userRouter from './user/userRouter.js';
 import adminRouter from './admin/adminRouter.js';
 import authRouter from './auth/authRouter.js';
+
+const router = express.Router();
 
 router.use('/nft', nftRouter);
 router.use('/collection', collectionRouter);
