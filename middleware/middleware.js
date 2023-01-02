@@ -45,7 +45,7 @@ const verifyWithoutToken = (req, res, next) => {
       next();
     }
   } catch (error) {
-    return res.reply(messages.server_error());
+    return res.send(error);
   }
 };
 
