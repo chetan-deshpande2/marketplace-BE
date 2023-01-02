@@ -22,19 +22,19 @@ const s3 = new aws.S3({
 });
 
 const storage = multerS3({
-  s3: s3,
+  s3,
   bucket: 'staging-decrypt-nft-io',
   acl: 'public-read',
   contentType: multerS3.AUTO_CONTENT_TYPE,
-  key: function (request, file, cb) {
+  key(request, file, cb) {
     cb(null, file.originalname);
   },
 });
 
-var allowedMimes;
-var errAllowed;
+let allowedMimes;
+let errAllowed;
 
-let fileFilter = function (req, file, cb) {
+const fileFilter = function (req, file, cb) {
   if (allowedMimes.includes(file.mimetype)) {
     cb(null, true);
   } else {
@@ -59,14 +59,13 @@ const storage1 = multer.diskStorage({
   },
 });
 
-let oMulterObj = {
+const oMulterObj = {
   storage: storage1,
   limits: {
     fileSize: 15 * 1024 * 1024, // 15mb
   },
-  fileFilter: fileFilter,
+  fileFilter,
 };
-
 
 const upload = multer(oMulterObj);
 const uploadBanner = multer(oMulterObj);
@@ -117,7 +116,7 @@ const create = async (req, res, next) => {
             ? req.body.nCollection
             : '',
         nHash: cid,
-        nOwnedBy: [], //setting ownedby for first time empty
+        nOwnedBy: [], // setting ownedby for first time empty
         nQuantity: req.body.nQuantity,
         nCollaborator: req.body.nCollaborator.split(','),
         nCollaboratorPercentage: req.body.nCollaboratorPercentage
@@ -140,7 +139,7 @@ const create = async (req, res, next) => {
         const collection = await Collection.findOne({
           sContractAddress: req.body.nCollection,
         });
-        let nextId = collection.getNextId();
+        const nextId = collection.getNextId();
         collection.nextId = nextId;
         collection.save();
         console.log(result);
@@ -154,7 +153,7 @@ const create = async (req, res, next) => {
 
 const etNFTOrder = async (req, res) => {
   try {
-    let aNft = await NFT.findById(req.body.nftId);
+    const aNft = await NFT.findById(req.body.nftId);
     if (!aNft) return res.send('NFT Not found');
 
     aNft.nOrders.push(req.body.orderId);
@@ -168,18 +167,18 @@ const etNFTOrder = async (req, res) => {
 const myNFTList = async (req, res) => {
   try {
     if (!req.body.userId) return res.send('unauthorized user');
-    var nLimit = parseInt(req.body.length);
-    var nOffset = parseInt(req.body.start);
-    let oTypeQuery = {},
-      oSellingTypeQuery = {},
-      oSortingOrder = {};
+    const nLimit = parseInt(req.body.length);
+    const nOffset = parseInt(req.body.start);
+    let oTypeQuery = {};
+    let oSellingTypeQuery = {};
+    const oSortingOrder = {};
     console.log(req.body);
     if (req.body.eType[0] != 'All' && req.body.eType[0] != '') {
       oTypeQuery = {
         $or: [],
       };
       req.body.eType.forEach((element) => {
-        oTypeQuery['$or'].push({
+        oTypeQuery.$or.push({
           eType: element,
         });
       });
@@ -195,17 +194,17 @@ const myNFTList = async (req, res) => {
         };
       }
       if (req.body.sSortingType == 'Recently Added') {
-        oSortingOrder['sCreated'] = -1;
+        oSortingOrder.sCreated = -1;
       } else if (req.body.sSortingType == 'Most Viewed') {
-        oSortingOrder['nView'] = -1;
+        oSortingOrder.nView = -1;
       } else if (req.body.sSortingType == 'Price Low to High') {
-        oSortingOrder['nBasePrice'] = 1;
+        oSortingOrder.nBasePrice = 1;
       } else if (req.body.sSortingType == 'Price High to Low') {
-        oSortingOrder['nBasePrice'] = -1;
+        oSortingOrder.nBasePrice = -1;
       } else {
-        oSortingOrder['_id'] = -1;
+        oSortingOrder._id = -1;
       }
-      let data = await NFT.aggregate([
+      const data = await NFT.aggregate([
         {
           $match: {
             $and: [
@@ -325,7 +324,7 @@ const myNFTList = async (req, res) => {
           },
         },
       ]);
-      let iFiltered = data[0].nfts.length;
+      const iFiltered = data[0].nfts.length;
       if (data[0].totalCount[0] == undefined) {
         return res.send({
           message: 'Data',
@@ -334,15 +333,14 @@ const myNFTList = async (req, res) => {
           recordsTotal: 0,
           recordsFiltered: iFiltered,
         });
-      } else {
-        return res.send({
-          message: 'NFT Details',
-          data: data[0].nfts,
-          draw: req.body.draw,
-          recordsTotal: data[0].totalCount[0].count,
-          recordsFiltered: iFiltered,
-        });
       }
+      return res.send({
+        message: 'NFT Details',
+        data: data[0].nfts,
+        draw: req.body.draw,
+        recordsTotal: data[0].totalCount[0].count,
+        recordsFiltered: iFiltered,
+      });
     }
   } catch (error) {
     res.send(error);
@@ -354,7 +352,7 @@ const nftID = async (req, res) => {
   try {
     if (!req.params.nNFTId) return res.send('NFT Id not found');
 
-    let aNFT = await NFT.findById(req.params.nNFTId).populate({
+    const aNFT = await NFT.findById(req.params.nNFTId).populate({
       path: 'nCreater',
       options: {
         limit: 1,
@@ -424,18 +422,18 @@ const nftID = async (req, res) => {
 const nftListing = async (req, res) => {
   try {
     if (!req.userId) return res.send('unauthroized');
-    var nLimit = parseInt(req.body.length);
-    var nOffset = parseInt(req.body.start);
-    let oTypeQuery = {},
-      oSellingTypeQuery = {},
-      oSortingOrder = {};
+    const nLimit = parseInt(req.body.length);
+    const nOffset = parseInt(req.body.start);
+    let oTypeQuery = {};
+    let oSellingTypeQuery = {};
+    const oSortingOrder = {};
     console.log(req.body);
     if (req.body.eType[0] != 'All' && req.body.eType[0] != '') {
       oTypeQuery = {
         $or: [],
       };
       req.body.eType.forEach((element) => {
-        oTypeQuery['$or'].push({
+        oTypeQuery.$or.push({
           eType: element,
         });
       });
@@ -453,17 +451,17 @@ const nftListing = async (req, res) => {
       };
     }
     if (req.body.sSortingType == 'Recently Added') {
-      oSortingOrder['sCreated'] = -1;
+      oSortingOrder.sCreated = -1;
     } else if (req.body.sSortingType == 'Most Viewed') {
-      oSortingOrder['nView'] = -1;
+      oSortingOrder.nView = -1;
     } else if (req.body.sSortingType == 'Price Low to High') {
-      oSortingOrder['nBasePrice'] = 1;
+      oSortingOrder.nBasePrice = 1;
     } else if (req.body.sSortingType == 'Price High to Low') {
-      oSortingOrder['nBasePrice'] = -1;
+      oSortingOrder.nBasePrice = -1;
     } else {
-      oSortingOrder['_id'] = -1;
+      oSortingOrder._id = -1;
     }
-    let data = await NFT.aggregate([
+    const data = await NFT.aggregate([
       {
         $match: {
           $and: [
@@ -583,7 +581,7 @@ const nftListing = async (req, res) => {
         },
       },
     ]);
-    let iFiltered = data[0].nfts.length;
+    const iFiltered = data[0].nfts.length;
     if (data[0].totalCount[0] == undefined) {
       return res.send({
         message: 'Data',
@@ -592,15 +590,14 @@ const nftListing = async (req, res) => {
         recordsTotal: 0,
         recordsFiltered: iFiltered,
       });
-    } else {
-      return res.send({
-        message: 'NFT Details',
-        data: data[0].nfts,
-        draw: req.body.draw,
-        recordsTotal: data[0].totalCount[0].count,
-        recordsFiltered: iFiltered,
-      });
     }
+    return res.send({
+      message: 'NFT Details',
+      data: data[0].nfts,
+      draw: req.body.draw,
+      recordsTotal: data[0].totalCount[0].count,
+      recordsFiltered: iFiltered,
+    });
   } catch {
     res.send(error);
   }
@@ -622,14 +619,13 @@ const getNFTOwner = async (req, res) => {
       );
       console.log('nft owner is-->', nftOwner);
       return res.send({ message: 'success', nftOwner });
-    } else {
-      if (nftOwner.oCurrentOwner) {
-        users = await User.findOne(nftOwner.oCurrentOwner);
-        nftOwner.oCurrentOwner = users;
-      }
-      console.log('nft owner is-->', nftOwner);
-      return res.send({ message: 'success', nftOwner });
     }
+    if (nftOwner.oCurrentOwner) {
+      users = await User.findOne(nftOwner.oCurrentOwner);
+      nftOwner.oCurrentOwner = users;
+    }
+    console.log('nft owner is-->', nftOwner);
+    return res.send({ message: 'success', nftOwner });
   } catch (error) {
     res.send(error);
   }
@@ -667,40 +663,39 @@ const updateBasePrice = async (req, res) => {
     ) {
       return res.send('Invalid base price');
     }
-    let oNFT = await NFT.findById(req.body.nNFTId);
+    const oNFT = await NFT.findById(req.body.nNFTId);
 
     if (!oNFT) return res.send('NFT Not Found');
     if (oNFT.oCurrentOwner != req.userId)
       return res.send('Only NFT Owner can set base Price');
 
-    let BIdsExist = await Bid.find({
+    const BIdsExist = await Bid.find({
       oNFTId: mongoose.Types.ObjectId(req.body.nNFTId),
       sTransactionStatus: 1,
       eBidStatus: 'Bid',
     });
     if (BIdsExist && BIdsExist != undefined && BIdsExist.length) {
       return res.send('Please Cancel Active bids on this NFT.');
-    } else {
-      NFT.findByIdAndUpdate(
-        req.body.nNFTId,
-        {
-          nBasePrice: req.body.nBasePrice,
-        },
-        (err, nft) => {
-          if (err) return res.send('sever Error');
-          if (!nft) return res.send('NFT not found');
-
-          return res.send('Price is updated');
-        }
-      );
     }
+    NFT.findByIdAndUpdate(
+      req.body.nNFTId,
+      {
+        nBasePrice: req.body.nBasePrice,
+      },
+      (err, nft) => {
+        if (err) return res.send('sever Error');
+        if (!nft) return res.send('NFT not found');
+
+        return res.send('Price is updated');
+      }
+    );
   } catch (error) {
     return res.send(error);
   }
 };
 const setNFTOrder = async (req, res) => {
   try {
-    let aNft = await NFT.findById(req.body.nftId);
+    const aNft = await NFT.findById(req.body.nftId);
     if (!aNft) {
       return res.send('NFT Not Found');
     }
@@ -715,12 +710,12 @@ const setNFTOrder = async (req, res) => {
 };
 const getOnSaleItems = async (req, res) => {
   try {
-    let data = [];
+    const data = [];
     console.log('data===>', data);
-    let OrderSearchArray = [];
-    let sSellingType = req.body.sSellingType;
-    let sTextsearch = req.body.sTextsearch;
-    let itemType = req.body.itemType;
+    const OrderSearchArray = [];
+    const { sSellingType } = req.body;
+    const { sTextsearch } = req.body;
+    const { itemType } = req.body;
     const page = parseInt(req.body.page);
     const limit = parseInt(req.body.limit);
     console.log(
@@ -734,39 +729,39 @@ const getOnSaleItems = async (req, res) => {
     const startIndex = (page - 1) * limit;
     const endIndex = page * limit;
 
-    OrderSearchArray['oStatus'] = 1;
+    OrderSearchArray.oStatus = 1;
     if (sSellingType !== '') {
-      OrderSearchArray['oType'] = sSellingType;
+      OrderSearchArray.oType = sSellingType;
     }
-    let OrderSearchObj = Object.assign({}, OrderSearchArray);
-    let OrderIdsss = await Order.distinct('oNftId', OrderSearchObj);
+    const OrderSearchObj = { ...OrderSearchArray };
+    const OrderIdsss = await Order.distinct('oNftId', OrderSearchObj);
     console.log('Order Ids======', OrderIdsss);
 
-    let NFTSearchArray = [];
-    NFTSearchArray['_id'] = { $in: OrderIdsss.map(String) };
+    const NFTSearchArray = [];
+    NFTSearchArray._id = { $in: OrderIdsss.map(String) };
     console.log('NFTSearchArray Array======', NFTSearchArray);
     if (sTextsearch !== '') {
-      NFTSearchArray['nTitle'] = {
+      NFTSearchArray.nTitle = {
         $regex: new RegExp(sTextsearch),
         $options: '<options>',
       };
     }
     if (itemType !== '') {
-      NFTSearchArray['nType'] = itemType;
+      NFTSearchArray.nType = itemType;
     }
-    let NFTSearchObj = Object.assign({}, NFTSearchArray);
+    const NFTSearchObj = { ...NFTSearchArray };
     console.log('NFT OBj Search========', NFTSearchObj);
     const results = {};
     if (endIndex < (await NFT.countDocuments(NFTSearchObj).exec())) {
       results.next = {
         page: page + 1,
-        limit: limit,
+        limit,
       };
     }
     if (startIndex > 0) {
       results.previous = {
         page: page - 1,
-        limit: limit,
+        limit,
       };
     }
     await NFT.find(NFTSearchObj)
@@ -828,13 +823,13 @@ const toggleSellingType = async (req, res) => {
     if (!req.body.nNFTId) return res.send('ID Not Found');
     if (!req.body.sSellingType) return res.send('Selling Type Not Found');
 
-    let oNFT = await NFT.findById(req.body.nNFTId);
+    const oNFT = await NFT.findById(req.body.nNFTId);
 
     if (!oNFT) return res.send('NFT Not Found');
     if (oNFT.oCurrentOwner != req.userId)
       return res.send('Only NFT Owner Can Set Selling Type');
 
-    let BIdsExist = await Bid.find({
+    const BIdsExist = await Bid.find({
       oNFTId: mongoose.Types.ObjectId(req.body.nNFTId),
       sTransactionStatus: 1,
       eBidStatus: 'Bid',
@@ -842,20 +837,19 @@ const toggleSellingType = async (req, res) => {
 
     if (BIdsExist && BIdsExist != undefined && BIdsExist.length) {
       return res.send('Please Cancel Active bids on this NFT.');
-    } else {
-      let updObj = {
-        eAuctionType: req.body.sSellingType,
-      };
-      if (req.body.auction_end_date && req.body.auction_end_date != undefined) {
-        updObj.auction_end_date = req.body.auction_end_date;
-      }
-      NFT.findByIdAndUpdate(req.body.nNFTId, updObj, (err, nft) => {
-        if (err) return res.send('Server Error');
-        if (!nft) return res.send('NFT Not Found');
-
-        return res.send('NFT Details');
-      });
     }
+    const updObj = {
+      eAuctionType: req.body.sSellingType,
+    };
+    if (req.body.auction_end_date && req.body.auction_end_date != undefined) {
+      updObj.auction_end_date = req.body.auction_end_date;
+    }
+    NFT.findByIdAndUpdate(req.body.nNFTId, updObj, (err, nft) => {
+      if (err) return res.send('Server Error');
+      if (!nft) return res.send('NFT Not Found');
+
+      return res.send('NFT Details');
+    });
   } catch (error) {
     res.send(error);
   }
@@ -866,43 +860,42 @@ const uploadImage = async (req, res) => {
     errAllowed = 'JPG, JPEG, PNG,GIF';
     uploadBanner.single('nftFile')(req, res, (error) => {
       if (error) {
-        //instanceof multer.MulterError
+        // instanceof multer.MulterError
         fs.unlinkSync(req.file.path);
         return res.send('Multer Error');
-      } else {
-        if (!req.file) {
-          fs.unlinkSync(req.file.path);
-          return res.send('File Not Found');
-        }
-        const oOptions = {
-          pinataMetadata: {
-            name: req.file.originalname,
-          },
-          pinataOptions: {
-            cidVersion: 0,
-          },
-        };
-        const readableStreamForFile = fs.createReadStream(req.file.path);
-        let testFile = fs.readFileSync(req.file.path);
-        //Creating buffer for ipfs function to add file to the system
-        let testBuffer = new Buffer(testFile);
-        try {
-          pinata
-            .pinFileToIPFS(readableStreamForFile, oOptions)
-            .then(async (result) => {
-              fs.unlinkSync(req.file.path);
-              return res.send({
-                message: Collection,
-                track_cover: result.IpfsHash,
-              });
-            })
-            .catch((err) => {
-              //handle error here
-              return res.send(err);
+      }
+      if (!req.file) {
+        fs.unlinkSync(req.file.path);
+        return res.send('File Not Found');
+      }
+      const oOptions = {
+        pinataMetadata: {
+          name: req.file.originalname,
+        },
+        pinataOptions: {
+          cidVersion: 0,
+        },
+      };
+      const readableStreamForFile = fs.createReadStream(req.file.path);
+      const testFile = fs.readFileSync(req.file.path);
+      // Creating buffer for ipfs function to add file to the system
+      const testBuffer = new Buffer(testFile);
+      try {
+        pinata
+          .pinFileToIPFS(readableStreamForFile, oOptions)
+          .then(async (result) => {
+            fs.unlinkSync(req.file.path);
+            return res.send({
+              message: Collection,
+              track_cover: result.IpfsHash,
             });
-        } catch {
-          return res.send(err);
-        }
+          })
+          .catch((err) =>
+            // handle error here
+            res.send(err)
+          );
+      } catch {
+        return res.send(err);
       }
     });
   } catch (error) {
@@ -911,7 +904,7 @@ const uploadImage = async (req, res) => {
 };
 const getAllNFTs = async (req, res) => {
   try {
-    let aNft = await NFT.find({})
+    const aNft = await NFT.find({})
       .select({
         nTitle: 1,
         nCollection: 1,
@@ -965,16 +958,16 @@ const getAllNFTs = async (req, res) => {
 };
 const getOwnedNFTList = async (req, res) => {
   try {
-    let data = [];
+    const data = [];
     console.log('req', req.body);
-    //sortKey is the column
+    // sortKey is the column
     const sortKey = req.body.sortKey ? req.body.sortKey : '';
 
-    //sortType will let you choose from ASC 1 or DESC -1
+    // sortType will let you choose from ASC 1 or DESC -1
     const sortType = req.body.sortType ? req.body.sortType : -1;
-    var sortObject = {};
-    var stype = sortKey;
-    var sdir = sortType;
+    const sortObject = {};
+    const stype = sortKey;
+    const sdir = sortType;
     sortObject[stype] = sdir;
     const page = parseInt(req.body.page);
     const limit = parseInt(req.body.limit);
@@ -997,13 +990,13 @@ const getOwnedNFTList = async (req, res) => {
       ) {
         results.next = {
           page: page + 1,
-          limit: limit,
+          limit,
         };
       }
       if (startIndex > 0) {
         results.previous = {
           page: page - 1,
-          limit: limit,
+          limit,
         };
       }
       await NFT.find({
@@ -1074,13 +1067,13 @@ const getOwnedNFTList = async (req, res) => {
       ) {
         results.next = {
           page: page + 1,
-          limit: limit,
+          limit,
         };
       }
       if (startIndex > 0) {
         results.previous = {
           page: page - 1,
-          limit: limit,
+          limit,
         };
       }
       await NFT.find({
@@ -1144,17 +1137,17 @@ const getOwnedNFTList = async (req, res) => {
 const getUserOnSaleNfts = async (req, res) => {
   try {
     console.log('req', req.body);
-    let data = [];
+    const data = [];
 
-    let query = {};
-    let orderQuery = {};
+    const query = {};
+    const orderQuery = {};
 
-    orderQuery['oSeller'] = mongoose.Types.ObjectId(req.body.userId);
-    orderQuery['oStatus'] = 1; // we are getting only active orders
+    orderQuery.oSeller = mongoose.Types.ObjectId(req.body.userId);
+    orderQuery.oStatus = 1; // we are getting only active orders
 
     if (req.body.hasOwnProperty('search')) {
       for (var key in req.body.search) {
-        //could also be req.query and req.params
+        // could also be req.query and req.params
         req.body.search[key] !== ''
           ? (query[key] = req.body.search[key])
           : null;
@@ -1163,7 +1156,7 @@ const getUserOnSaleNfts = async (req, res) => {
 
     if (req.body.hasOwnProperty('searchOrder')) {
       for (var key in req.body.searchOrder) {
-        //could also be req.query and req.params
+        // could also be req.query and req.params
         req.body.searchOrder[key] !== ''
           ? (orderQuery[key] = req.body.searchOrder[key])
           : null;
@@ -1171,24 +1164,24 @@ const getUserOnSaleNfts = async (req, res) => {
     }
 
     console.log('orderQuery', orderQuery);
-    //select unique NFTids for status 1 and userId supplied
-    let OrderIdsss = await Order.distinct('oNftId', orderQuery);
+    // select unique NFTids for status 1 and userId supplied
+    const OrderIdsss = await Order.distinct('oNftId', orderQuery);
     console.log('order idss', OrderIdsss);
-    //return if no active orders found
+    // return if no active orders found
     if (OrderIdsss.length < 1) return res.send('Not Found');
 
-    //set nftQuery
-    query['_id'] = { $in: OrderIdsss };
+    // set nftQuery
+    query._id = { $in: OrderIdsss };
 
-    //sortKey is the column
+    // sortKey is the column
     const sortKey = req.body.sortKey ? req.body.sortKey : '';
 
-    //sortType will let you choose from ASC 1 or DESC -1
+    // sortType will let you choose from ASC 1 or DESC -1
     const sortType = req.body.sortType ? req.body.sortType : -1;
 
-    var sortObject = {};
-    var stype = sortKey;
-    var sdir = sortType;
+    const sortObject = {};
+    const stype = sortKey;
+    const sdir = sortType;
     sortObject[stype] = sdir;
 
     const page = parseInt(req.body.page);
@@ -1204,14 +1197,14 @@ const getUserOnSaleNfts = async (req, res) => {
     ) {
       results.next = {
         page: page + 1,
-        limit: limit,
+        limit,
       };
     }
 
     if (startIndex > 0) {
       results.previous = {
         page: page - 1,
-        limit: limit,
+        limit,
       };
     }
 
@@ -1273,12 +1266,12 @@ const getUserOnSaleNfts = async (req, res) => {
 };
 
 const transferNfts = async (req, res) => {
-  //deduct previous owner
+  // deduct previous owner
   console.log('req', req.body);
   try {
     if (!req.userId) return res.send('Unauthorized');
 
-    let _NFT = await NFT.findOne({
+    const _NFT = await NFT.findOne({
       _id: mongoose.Types.ObjectId(req.body.nftId),
       'nOwnedBy.address': req.body.sender,
     }).select('nOwnedBy -_id');
@@ -1288,7 +1281,7 @@ const transferNfts = async (req, res) => {
       (o) => o.address === req.body.sender.toLowerCase()
     ).quantity;
     let boughtQty = parseInt(req.body.qty);
-    let leftQty = currentQty - boughtQty;
+    const leftQty = currentQty - boughtQty;
     if (leftQty < 1) {
       await NFT.findOneAndUpdate(
         { _id: mongoose.Types.ObjectId(req.body.nftId) },
@@ -1316,17 +1309,17 @@ const transferNfts = async (req, res) => {
       });
     }
 
-    //Credit the buyer
+    // Credit the buyer
     console.log('Crediting Buyer');
 
-    let subDocId = await NFT.exists({
+    const subDocId = await NFT.exists({
       _id: mongoose.Types.ObjectId(req.body.nftId),
       'nOwnedBy.address': req.body.receiver,
     });
     if (subDocId) {
       console.log('Subdocument Id', subDocId);
 
-      let _NFTB = await NFT.findOne({
+      const _NFTB = await NFT.findOne({
         _id: mongoose.Types.ObjectId(req.body.nftId),
         'nOwnedBy.address': req.body.receiver,
       }).select('nOwnedBy -_id');
@@ -1347,7 +1340,7 @@ const transferNfts = async (req, res) => {
           )
         : 0;
       boughtQty = req.body.qty;
-      let ownedQty = currentQty + boughtQty;
+      const ownedQty = currentQty + boughtQty;
 
       await NFT.findOneAndUpdate(
         {
@@ -1365,7 +1358,7 @@ const transferNfts = async (req, res) => {
       });
     } else {
       console.log('Subdocument Id not found');
-      let dataToadd = {
+      const dataToadd = {
         address: req.body.receiver,
         quantity: parseInt(req.body.qty),
       };
@@ -1384,18 +1377,18 @@ const transferNfts = async (req, res) => {
 };
 const getSearchedNft = async (req, res) => {
   try {
-    let data = [];
-    let setConditions = req.body.conditions;
+    const data = [];
+    const setConditions = req.body.conditions;
 
-    //sortKey is the column
+    // sortKey is the column
     const sortKey = req.body.sortKey ? req.body.sortKey : '';
 
-    //sortType will let you choose from ASC 1 or DESC -1
+    // sortType will let you choose from ASC 1 or DESC -1
     const sortType = req.body.sortType ? req.body.sortType : -1;
 
-    var sortObject = {};
-    var stype = sortKey;
-    var sdir = sortType;
+    const sortObject = {};
+    const stype = sortKey;
+    const sdir = sortType;
     sortObject[stype] = sdir;
 
     const page = parseInt(req.body.page);
@@ -1405,7 +1398,7 @@ const getSearchedNft = async (req, res) => {
     const endIndex = page * limit;
 
     const results = {};
-    let OrderIdsss = await Order.distinct('oNftId', setConditions);
+    const OrderIdsss = await Order.distinct('oNftId', setConditions);
 
     if (
       endIndex <
@@ -1416,14 +1409,14 @@ const getSearchedNft = async (req, res) => {
     ) {
       results.next = {
         page: page + 1,
-        limit: limit,
+        limit,
       };
     }
 
     if (startIndex > 0) {
       results.previous = {
         page: page - 1,
-        limit: limit,
+        limit,
       };
     }
 
@@ -1501,41 +1494,41 @@ const updateNFTDeatils = async (req, res) => {
 };
 const getHotCollection = async (req, res) => {
   try {
-    let data = [];
+    const data = [];
     let setConditions = {};
-    let sTextsearch = req.body.sTextsearch;
-    const erc721 = req.body.erc721;
+    const { sTextsearch } = req.body;
+    const { erc721 } = req.body;
 
     if (req.body.conditions) {
       setConditions = req.body.conditions;
     }
 
-    //sortKey is the column
+    // sortKey is the column
     const sortKey = req.body.sortKey ? req.body.sortKey : '';
 
-    //sortType will let you choose from ASC 1 or DESC -1
+    // sortType will let you choose from ASC 1 or DESC -1
     const sortType = req.body.sortType ? req.body.sortType : -1;
 
-    var sortObject = {};
-    var stype = sortKey;
-    var sdir = sortType;
+    const sortObject = {};
+    const stype = sortKey;
+    const sdir = sortType;
     sortObject[stype] = sdir;
 
-    let CollectionSearchArray = [];
+    const CollectionSearchArray = [];
     if (sTextsearch !== '') {
-      CollectionSearchArray['sName'] = {
+      CollectionSearchArray.sName = {
         $regex: new RegExp(sTextsearch),
         $options: '<options>',
       };
     }
 
     if (erc721 !== '' && erc721) {
-      CollectionSearchArray['erc721'] = true;
+      CollectionSearchArray.erc721 = true;
     }
     if (erc721 !== '' && erc721 === false) {
-      CollectionSearchArray['erc721'] = false;
+      CollectionSearchArray.erc721 = false;
     }
-    let CollectionSearchObj = Object.assign({}, CollectionSearchArray);
+    const CollectionSearchObj = { ...CollectionSearchArray };
 
     const page = parseInt(req.body.page);
     const limit = parseInt(req.body.limit);
@@ -1550,18 +1543,18 @@ const getHotCollection = async (req, res) => {
     ) {
       results.next = {
         page: page + 1,
-        limit: limit,
+        limit,
       };
     }
 
     if (startIndex > 0) {
       results.previous = {
         page: page - 1,
-        limit: limit,
+        limit,
       };
     }
 
-    let aCollections = await Collection.aggregate([
+    const aCollections = await Collection.aggregate([
       {
         $lookup: {
           from: 'users',
