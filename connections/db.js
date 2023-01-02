@@ -1,6 +1,7 @@
 /* eslint-disable no-undef */
 import mongoose from 'mongoose';
 import dontenv from 'dotenv';
+
 dontenv.config();
 
 const connectionURI = process.env.MONGODB_URL;
