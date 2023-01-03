@@ -61,7 +61,7 @@ const createBidNft = async (req, res) => {
   }
 };
 
-const updateBid = async (req, res) => {
+const updateBidNft = async (req, res) => {
   try {
     console.log('Checking Old Bids');
     let bidID = req.body.bidID;
@@ -76,7 +76,7 @@ const updateBid = async (req, res) => {
               return res.send(err);
             } else {
               console.log('Bid Deleted : ', delBid);
-              return res.send('Bid Cancelled', delBid);
+              return res.send({ message: 'Bid Cancelled', delBid });
             }
           }
         );
@@ -87,10 +87,10 @@ const updateBid = async (req, res) => {
           function (err, rejBid) {
             if (err) {
               console.log('Error in Rejecting Bid' + err);
-              return res.reply(messages.error());
+              return res.send(err);
             } else {
               console.log('Bid Rejected : ', rejBid);
-              return res.reply(messages.created('Bid Rejected'), rejBid);
+              return res.send({ message: 'Bid Rejected', rejBid });
             }
           }
         );
@@ -102,6 +102,7 @@ const updateBid = async (req, res) => {
     res.send(error);
   }
 };
+
 const fetchBidNft = async (req, res) => {
   try {
     if (!req.userId) return res.send('Unauthorized Access');
@@ -127,7 +128,7 @@ const fetchBidNft = async (req, res) => {
     if (buyerID != 'All') {
       buyerIDQuery = { bidderID: mongoose.Types.ObjectId(buyerID) };
     }
-    console.log(filters);
+
     let data = await Bid.aggregate([
       {
         $match: {
@@ -432,4 +433,4 @@ const acceptBidNft = async (req, res) => {
   }
 };
 
-export { createBidNft, updateBid, fetchBidNft, acceptBidNft };
+export { createBidNft, updateBidNft, fetchBidNft, acceptBidNft };
