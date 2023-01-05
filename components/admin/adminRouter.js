@@ -1,5 +1,11 @@
 import express from 'express';
-import { users } from './adminController.js';
+
+import {
+  users,
+  getDashboardData,
+  toggleUserStatus,
+  nftData,
+} from './adminController.js';
 import {
   verifyToken,
   verifyWithoutToken,
@@ -8,5 +14,8 @@ import {
 
 const router = express.Router();
 router.post('/user', users);
+router.get('/getDashobordData', verifyToken, getDashboardData);
+router.post('/toggleUserStatus', verifyToken, toggleUserStatus);
+router.post('/nftData', verifyToken, nftData);
 
 export default router;
