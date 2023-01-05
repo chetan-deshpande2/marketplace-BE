@@ -4,7 +4,7 @@ import {
   createBidNft,
   updateBidNft,
   fetchBidNft,
-  acceptBidNft
+  acceptBidNft,
 } from './bidController.js';
 import {
   verifyToken,
@@ -17,5 +17,6 @@ const router = express.Router();
 router.post('/createBidNft', verifyToken, createBidNft);
 router.post('/updateBidNft', updateBidNft);
 router.post('/fetchBidNft', verifyToken, fetchBidNft);
-router.post('/acceptBidNft', acceptBidNft);
+router.post('/acceptBidNft', verifyToken, acceptBidNft);
+
 export default router;

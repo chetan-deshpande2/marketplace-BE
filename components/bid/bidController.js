@@ -67,7 +67,11 @@ const updateBidNft = async (req, res) => {
     let bidID = req.body.bidID;
     let CheckBid = await Bid.findById(bidID);
     if (CheckBid) {
-      if (req.body.action == 'Delete' || req.body.action == 'Cancelled') {
+      if (
+        req.body.action == 'Delete' ||
+        req.body.action == 'Cancelled' ||
+        req.body.action === 'Rejected'
+      ) {
         await Bid.findOneAndDelete(
           { _id: mongoose.Types.ObjectId(bidID) },
           function (err, delBid) {
@@ -134,8 +138,7 @@ const fetchBidNft = async (req, res) => {
         $match: {
           $and: [
             { oBidQuantity: { $gte: 1 } },
-           {oNFTId:mongoose.Types.ObjectId(nftID)}
-            
+            { oNFTId: mongoose.Types.ObjectId(nftID) },
           ],
         },
       },
@@ -164,8 +167,6 @@ const fetchBidNft = async (req, res) => {
       { $unwind: '$oBidder' },
     ]);
 
-
-
     console.log('Datat==>>' + data.length);
 
     return res.send({
@@ -192,14 +193,15 @@ const fetchBidNft = async (req, res) => {
 const acceptBidNft = async (req, res) => {
   console.log(req.body);
   try {
-    if (!req.userId) return res.send('Unauthorized');
-    if (!req.boyd.BidId) return res.send('bid is required');
+    // if (!req.userId) return res.send('Unauthorized');
+    if (!req.body.bidID) return res.send('bid is required');
     console.log('Checking Old Bids');
     let erc721 = req.body.erc721;
     let bidID = req.body.bidID;
     let status = req.body.status;
     let qty_sold = req.body.qty_sold;
     let BidData = await Bid.findById(bidID);
+    // console.log(BidData);
     if (BidData) {
       let oNFTId = BidData.oNFTId;
       let orderId = BidData.oOrderId;
@@ -210,6 +212,7 @@ const acceptBidNft = async (req, res) => {
       let oOwner = BidData.oOwner;
       let OwnerData = await User.findById(oOwner);
       let oSeller = OwnerData.sWalletAddress;
+      // console.log(OwnerData);
       await Order.updateOne(
         { _id: orderId },
         {
@@ -222,21 +225,22 @@ const acceptBidNft = async (req, res) => {
           upsert: true,
         },
         (error) => {
-          if (err) throw error;
+          if (error) throw error;
         }
       );
       let _NFT = await NFT.findOne({
         _id: mongoose.Types.ObjectId(oNFTId),
-        'nOwnedBy.address': oSeller,
       }).select('nOwnedBy -_id');
-      console.log('_NFT-------->', _NFT);
-      let currentQty = _NFT.nOwnedBy.find(
-        (o) => o.address === oSeller.toLowerCase()
-      ).quantity;
+
+      // let _NFT = await NFT.findOne({ _id: mongoose.Types.ObjectId(oNFTId)
+      // 'nOwnedBy[0].address': oSeller, });
+      // console.log('_NFT-------->', _NFT);
+      let data1 = await NFT.findOne({ _id: mongoose.Types.ObjectId(oNFTId) });
+      let currentQty = data1.nQuantity;
 
       let leftQty = currentQty - boughtQty;
       if (leftQty < 1) {
-        await NFT.findOneAndUpdate(
+        let data = await NFT.findOneAndUpdate(
           { _id: mongoose.Types.ObjectId(oNFTId) },
           {
             $pull: {
@@ -246,6 +250,7 @@ const acceptBidNft = async (req, res) => {
         ).catch((e) => {
           console.log('Error1', e.message);
         });
+        // console.log(data);
       } else {
         await NFT.findByIdAndUpdate(
           {
@@ -261,24 +266,26 @@ const acceptBidNft = async (req, res) => {
           console.log('error2', error);
         });
       }
-      //Credit the buyer
+
       console.log('Crediting Buyer');
       let subDocId = await NFT.exists({
         _id: mongoose.Types.ObjectId(oNFTId),
         'nOwnedBy.address': oBuyer,
       });
+
+      console.log(subDocId);
       if (subDocId) {
         console.log('Subdocument Id', subDocId);
         let _NFTB = await NFT.findOne({
           _id: mongoose.Types.ObjectId(oNFTId),
           'nOwnedBy.address': oBuyer,
         }).select('nOwnedBy -_id');
-        console.log('_NFTB-------->', _NFTB);
-        console.log(
-          'Quantity found for buyers',
-          _NFTB.nOwnedBy.find((o) => o.address === oBuyer.toLowerCase())
-            .quantity
-        );
+        // console.log('_NFTB-------->', _NFTB);
+        // console.log(
+        //   'Quantity found for buyers',
+        //   _NFTB.nOwnedBy.find((o) => o.address === oBuyer.toLowerCase())
+        //     .quantity
+        // );
         currentQty = _NFTB.nOwnedBy.find(
           (o) => o.address === oBuyer.toLowerCase()
         ).quantity
@@ -315,6 +322,7 @@ const acceptBidNft = async (req, res) => {
         );
         console.log("wasn't there but added");
       }
+
       await Bid.findOneAndUpdate(
         {
           _id: mongoose.Types.ObjectId(bidID),
@@ -323,17 +331,18 @@ const acceptBidNft = async (req, res) => {
         function (err, acceptBid) {
           if (err) {
             console.log('Error in Accepting Bid' + err);
-            return res.reply(messages.error());
+            return res.send(err);
           } else {
             console.log('Bid Accepted : ', acceptBid);
           }
         }
       );
       if (erc721) {
-        await Bid.deleteMany({
+        console.log('===Owner Data', oOwner, oNFTId);
+        await Bid.findOneAndDelete({
           oOwner: mongoose.Types.ObjectId(oOwner),
           oNFTId: mongoose.Types.ObjectId(oNFTId),
-          oBidStatus: 'Bid',
+          // oBidStatus: 'Bid',
         })
           .then(function () {
             console.log('Data deleted');

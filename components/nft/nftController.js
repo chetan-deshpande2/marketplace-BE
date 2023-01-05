@@ -602,6 +602,7 @@ const nftListing = async (req, res) => {
     res.send(error);
   }
 };
+
 const getNFTOwner = async (req, res) => {
   try {
     console.log('user id && NFTId -->', req.userId, req.params.nNFTId);
@@ -630,6 +631,7 @@ const getNFTOwner = async (req, res) => {
     res.send(error);
   }
 };
+
 const getAllNFTOwner = async (req, res) => {
   try {
     console.log('All Nft Called -->', req.params.nNFTId);
