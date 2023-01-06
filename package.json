@@ -4,7 +4,7 @@
   "description": "",
   "type": "module",
   "scripts": {
-    "start": "node www.js",
+    "start": "node app.js",
     "dev": "nodemon app.js",
     "remove": "rm -rf dist lib"
   },
