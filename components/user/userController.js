@@ -48,6 +48,8 @@ const profile = async (req, res) => {
         sEmail: 1,
         sWalletAddress: 1,
         sProfilePicUrl: 1,
+        sHash:1,
+        sImageName:1,
         sWebsite: 1,
         sBio: 1,
         user_followings_size: {
@@ -116,7 +118,7 @@ const updateProfile = async (req, res) => {
             sWebsite: req.body.sWebsite,
             sBio: req.body.sBio,
             sEmail: req.body.sEmail,
-            sImageName: req.file.originalname,
+            sImageName: req.file.filenames,
             sHash: cid,
           };
           console.log('here--->>');
