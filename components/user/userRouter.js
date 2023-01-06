@@ -15,7 +15,7 @@ import {
 const router = express.Router();
 
 router.get('/profile', verifyToken, profile);
-router.put('/updateProfile', verifyToken, updateProfile);
+router.post('/updateProfile', verifyToken, updateProfile);
 
 router.post('/addCollaborator', verifyToken, addCollaborator);
 

@@ -77,29 +77,23 @@ const profile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
   try {
-    console.log('inside try');
     if (!req.userId) return res.send('UnAuthorized');
+
     console.log(req.userId);
     let oProfileDetails = {};
 
-    upload2('userProfile')(req, res, async (error) => {
-      console.log('inside');
-
-      console.log(req.file.originalname);
-
+    upload2.single('userProfile')(req, res, async (error) => {
       const token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlCMzlDMDMxQUQ2OTg0Mzk4RTQ1NzQ0YTk2YzNkMzc0ZDU0YURENTAiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk3MzAwNDk1NTYsIm5hbWUiOiJtYXJrZXRwbGFjZSJ9.io0FvRpm6l-nbxxRGDMZii4s03ErdxJbGaC3yEHXzFM';
 
       if (!token) {
-        console.error(
-          'A token is needed. You can create one on https://web3.storage'
-        );
         return;
       }
       const storage = new Web3Storage({ token });
       const files = await getFilesFromPath(req.file.path);
       const cid = await storage.put(files);
       console.log('Content added with CID:', cid);
+      console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
       console.log(`http://${cid}.ipfs.w3s.link/${req.file.filename}`);
 
       await User.findOne(
@@ -142,6 +136,7 @@ const updateProfile = async (req, res) => {
     res.send(error);
   }
 };
+
 const addCollaborator = async (req, res) => {
   try {
     if (!req.userId) return res.send('unauthorized user');
@@ -180,6 +175,7 @@ const addCollaborator = async (req, res) => {
     return res.send(error);
   }
 };
+
 const collaboratorList = async (req, res) => {
   try {
   } catch (error) {}
