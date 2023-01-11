@@ -48,8 +48,8 @@ const profile = async (req, res) => {
         sEmail: 1,
         sWalletAddress: 1,
         sProfilePicUrl: 1,
-        sHash:1,
-        sImageName:1,
+        sHash: 1,
+        sImageName: 1,
         sWebsite: 1,
         sBio: 1,
         user_followings_size: {
@@ -139,6 +139,147 @@ const updateProfile = async (req, res) => {
   }
 };
 
+const getAllUserDetails = async (req, res) => {
+  try {
+    let data = [];
+    const page = parseInt(req.body.page);
+    const limit = parseInt(req.body.limit);
+    const startIndex = (page - 1) * limit;
+    const endIndex = page * limit;
+    let searchText = req.body.searchText;
+    let UserSearchArray = [];
+    if (req.body.userId) {
+      UserSearchArray['_id'] = {
+        $ne: mongoose.Types.ObjectId(req.body.userId),
+      };
+    }
+    let UserSearchObj = Object.assign({}, UserSearchArray);
+    console.log(UserSearchObj);
+    let totalCount = 0;
+    if (searchText == '') {
+      totalCount = await User.countDocuments(UserSearchObj).exec();
+    } else {
+      totalCount = await User.countDocuments({
+        _id: { $ne: mongoose.Types.ObjectId(req.body.userId) },
+        $or: [
+          {
+            $expr: {
+              $regexMatch: {
+                input: { $concat: ['$Name.Firstname', ' ', '$Name.Lastname'] },
+                regex: new RegExp(searchText), //Your text search here
+                options: 'i',
+              },
+            },
+          },
+          { username: { $regex: new RegExp(searchText), $options: 'i' } },
+          { sWalletAddress: { $regex: new RegExp(searchText), $options: 'i' } },
+        ],
+      }).exec();
+    }
+
+    const results = {};
+    if (endIndex < totalCount) {
+      results.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+    if (searchText !== '') {
+      await User.find(UserSearchObj)
+        .find({
+          $or: [
+            {
+              $expr: {
+                $regexMatch: {
+                  input: {
+                    $concat: ['$Name.Firstname', ' ', '$Name.Lastname'],
+                  },
+                  regex: new RegExp(searchText), //Your text search here
+                  options: 'i',
+                },
+              },
+            },
+            { username: { $regex: new RegExp(searchText), $options: 'i' } },
+            {
+              swalletAddress: { $regex: new RegExp(searchText), $options: 'i' },
+            },
+          ],
+        })
+        .sort({ sCreated: -1 })
+        .select({
+          swalletAddress: 1,
+          username: 1,
+          email: 1,
+          Name: 1,
+          srole: 1,
+          sCreated: 1,
+          sStatus: 1,
+          sHash: 1,
+          bio: 1,
+          Website: 1,
+          profileIcon: 1,
+          aCollaborators: 1,
+          sResetPasswordToken: 1,
+          sResetPasswordExpires: 1,
+          is_user_following: 'false',
+          user_followings: 1,
+        })
+        .limit(limit)
+        .skip(startIndex)
+        .lean()
+        .exec()
+        .then((res) => {
+          data.push(res);
+        })
+        .catch((e) => {
+          console.log('Error', e);
+        });
+    } else {
+      await User.find(UserSearchObj)
+        .sort({ sCreated: -1 })
+        .select({
+          swalletAddress: 1,
+          username: 1,
+          email: 1,
+          Name: 1,
+          srole: 1,
+          sCreated: 1,
+          sStatus: 1,
+          sHash: 1,
+          bio: 1,
+          Website: 1,
+          profileIcon: 1,
+          aCollaborators: 1,
+          sResetPasswordToken: 1,
+          sResetPasswordExpires: 1,
+          is_user_following: 'false',
+          user_followings: 1,
+        })
+        .limit(limit)
+        .skip(startIndex)
+        .lean()
+        .exec()
+        .then((res) => {
+          data.push(res);
+        })
+        .catch((e) => {
+          console.log('Error', e);
+        });
+    }
+    results.count = totalCount;
+    results.results = data;
+    return res.send(results);
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
 const addCollaborator = async (req, res) => {
   try {
     if (!req.userId) return res.send('unauthorized user');
@@ -190,10 +331,7 @@ const deleteCollaborator = async (req, res) => {
   try {
   } catch (error) {}
 };
-const getAllUserDetails = async (req, res) => {
-  try {
-  } catch (error) {}
-};
+
 const getUserWithNfts = async (req, res) => {
   try {
   } catch (error) {}

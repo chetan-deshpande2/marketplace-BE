@@ -595,7 +595,26 @@ const updateCollectionToken = async (req, res) => {
   }
 };
 
+const getAllCollections = async (req, res) => {
+  try {
+    let data = [];
+
+    await Collection.find({})
+      .then((res) => {
+        data.push(res);
+      })
+      .catch((err) => {
+        return res.send(err);
+      });
+      
+    return res.send(data);
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
 export {
+  getAllCollections,
   createCollection,
   collectionList,
   getCollectionDetailsByAddress,

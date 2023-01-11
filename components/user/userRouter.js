@@ -1,10 +1,12 @@
 import express from 'express';
+
 import {
   profile,
   updateProfile,
   addCollaborator,
   getUserProfilewithNfts,
   getAddressById,
+  getAllUserDetails
 } from './userController.js';
 import {
   verifyToken,
@@ -22,6 +24,7 @@ router.post('/addCollaborator', verifyToken, addCollaborator);
 router.post('/profileDetail', getUserProfilewithNfts);
 
 router.post('/getAddressById', getAddressById);
+router.post('/getAllUserDetails', getAllUserDetails);
 //   router.post(
 //     "/collaboratorList",
 //     UserMiddleware.verifyToken,
@@ -54,12 +57,6 @@ router.post('/getAddressById', getAddressById);
 //     "/profileWithNfts",
 //     UserMiddleware.verifyWithoutToken,
 //     userController.getUserWithNfts
-//   );
-
-//   router.post(
-//     "/allDetails",
-//     UserMiddleware.verifyWithoutToken,
-//     userController.getAllUserDetails
 //   );
 
 export default router;

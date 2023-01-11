@@ -904,7 +904,9 @@ const uploadImage = async (req, res) => {
     res.send(error);
   }
 };
+
 const getAllNFTs = async (req, res) => {
+  let data = [];
   try {
     const aNft = await NFT.find({})
       .select({
@@ -937,8 +939,8 @@ const getAllNFTs = async (req, res) => {
           _id: 0,
         },
       })
-      .limit(limit)
-      .skip(startIndex)
+      .limit(req.body.limit)
+      .skip(req.body.startIndex)
       .exec()
       .then((res) => {
         data.push(res);
@@ -947,13 +949,7 @@ const getAllNFTs = async (req, res) => {
         console.log('Error', e);
       });
 
-    results.results = data;
-    console.log('Collections', aNft);
-
-    if (!aNft) {
-      return res.send('NFT not found');
-    }
-    return res.send({ message: 'NFT List', aNft });
+    return res.send({ message: 'NFT List', data });
   } catch (error) {
     return res.send(error);
   }

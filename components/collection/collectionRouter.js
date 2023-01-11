@@ -13,11 +13,11 @@ import {
   getCollectionNFTOwned,
   getSearchedNFT,
   updateCollectionToken,
+  getAllCollections,
 } from './collectionController.js';
 import {
   verifyToken,
   verifyWithoutToken,
-  proceedWithoutToken,
 } from '../../middleware/middleware.js';
 
 router.post('/createCollection', verifyToken, createCollection);
@@ -44,5 +44,7 @@ router.post(
   verifyToken,
   updateCollectionToken
 );
+
+router.get('/getAllCollections', getAllCollections);
 
 export default router;

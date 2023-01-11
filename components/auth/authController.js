@@ -1,7 +1,8 @@
 import dotenv from 'dotenv';
-import bcrypt from 'bcrypt';
+import bcrypt, { hash } from 'bcrypt';
 import jwt from 'jsonwebtoken';
 import User from './../user/userModel.js';
+import { checkAddress, validateSignature } from '../../helpers/helper.js';
 
 dotenv.config();
 
@@ -122,4 +123,69 @@ const Logout = async (req, res) => {
   }
 };
 
-export { register, login, checkUserAddress, Logout };
+const adminRegister = async (req, res) => {
+  try {
+    const walletAddress = req.body.walletAddress;
+    if (!walletAddress) return res.send('Require Wallet Address');
+    bcrypt.hash(walletAddress, saltRounds, async (error, hash) => {
+      if (error) return res.send(error);
+      const addr = await checkAddress(walletAddress);
+
+      const user = await new User({
+        sWalletAddress: addr,
+        sRole: 'admin',
+      });
+      user.save().then((result) => {
+        let token = signJWT(user);
+
+        return res.send({
+          message: 'User Created',
+          auth: true,
+          token,
+          walletAddress,
+        });
+      });
+    });
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
+const adminLogin = async (req, res) => {
+  try {
+    const walletAddress = req.body.walletAddress;
+    if (!walletAddress) return res.send('Require Wallet Address');
+    if (!signature) return res.send('Signature Not Found');
+    if (!validateSignature(req.body)) return res.send('Invalid Data');
+    let checkAddress = await checkAddress(req.body.walletAddress);
+    User.findOne(
+      {
+        sWalletAddress: checkAddress,
+        sRole: 'admin',
+      },
+      (error, user) => {
+        if (error) return res.send(error);
+        if (!user) return res.send('user Not found');
+        if (user && user.sStatus == 1) {
+          let token = signJWT(user);
+          req.session['_id'] = user._id;
+          req.session['walletAddress'] = user.walletAddress;
+
+          return res.send({
+            message: 'User Data',
+            auth: true,
+            token,
+            walletAddress: user.walletAddress,
+            userId: user._id,
+            userType: user.role,
+            userData: user,
+          });
+        }
+      }
+    );
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
+export { register, login, checkUserAddress, Logout, adminRegister, adminLogin };

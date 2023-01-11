@@ -10,9 +10,6 @@
   },
   "author": "",
   "license": "ISC",
-  "bugs": {
-    "url": "Test"
-  },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.204.0",
     "@openzeppelin/contracts": "^4.7.2",
@@ -36,6 +33,7 @@
     "debug": "^4.3.2",
     "dotenv": "^10.0.0",
     "ejs": "^3.1.7",
+    "ethereumjs-util": "^7.1.5",
     "express": "^4.17.1",
     "express-session": "^1.17.2",
     "fast-csv": "^4.3.6",
@@ -80,7 +78,7 @@
     "unique-username-generator": "^1.1.1",
     "upc-generator": "0.0.6",
     "uuid": "^9.0.0",
-    "web3": "^1.7.5",
+    "web3": "^1.8.1",
     "web3-providers-ws": "^1.5.3",
     "web3.storage": "^4.4.0",
     "winston": "^3.3.3"
@@ -105,7 +103,7 @@
     "eslint-plugin-prettier": "^3.1.4",
     "eslint-plugin-security": "^1.4.0",
     "ethereum-waffle": "^4.0.4",
-    "ethers": "^5.4.7",
+    "ethers": "^5.7.2",
     "hardhat": "^2.10.1",
     "husky": "^4.3.8",
     "lint-staged": "^10.2.11",

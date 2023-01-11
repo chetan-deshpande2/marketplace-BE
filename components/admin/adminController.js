@@ -249,6 +249,7 @@ const toggleUserStatus = async (req, res) => {
     res.send(error);
   }
 };
+
 const nftData = async (req, res) => {
   try {
     // Per page limit

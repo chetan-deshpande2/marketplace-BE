@@ -48,7 +48,7 @@ router.post('/getOnSaleItems', verifyWithoutToken, getOnSaleItems);
 router.put('/toggleSellingType', verifyToken, toggleSellingType);
 router.post('/uploadImage', verifyToken, uploadImage);
 
-router.get('/getAllNfts', getAllNFTs);
+router.post('/getAllNfts', getAllNFTs);
 router.post('/getOwnedNFTList', getOwnedNFTList);
 
 router.post('/getUserOnSaleNfts', getUserOnSaleNfts);
