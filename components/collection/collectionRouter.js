@@ -45,6 +45,6 @@ router.post(
   updateCollectionToken
 );
 
-router.get('/getAllCollections', getAllCollections);
+router.post('/getAllCollections', getAllCollections);
 
 export default router;

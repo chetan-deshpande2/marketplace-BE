@@ -599,15 +599,31 @@ const getAllCollections = async (req, res) => {
   try {
     let data = [];
 
-    await Collection.find({})
-      .then((res) => {
-        data.push(res);
-      })
-      .catch((err) => {
-        return res.send(err);
-      });
-      
-    return res.send(data);
+    let totalCount = 0;
+    totalCount = await Collection.countDocuments().exec();
+
+    const results = {};
+    // if (endIndex < totalCount) {
+    //   results.next = {
+    //     page: page + 1,
+    //     limit: limit,
+    //   };
+    // }
+    // if (startIndex > 0) {
+    //   results.previous = {
+    //     page: page - 1,
+    //     limit: limit,
+    //   };
+    // }
+    console.log(totalCount);
+    await Collection.find({}).then((res) => {
+      return data.push(res);
+    });
+
+    results.count = totalCount;
+    results.results = data;
+
+    return res.send(results);
   } catch (error) {
     return res.send(error);
   }

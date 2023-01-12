@@ -1584,6 +1584,85 @@ const getHotCollection = async (req, res) => {
     res.send(error);
   }
 };
+const viewAdminNfts = async (req, res) => {
+  let data = [];
+  const page = parseInt(req.body.page);
+  const limit = parseInt(req.body.limit);
+  const startIndex = (page - 1) * limit;
+  const endIndex = page * limit;
+  try {
+    let totalCount = 0;
+
+    totalCount = await NFT.countDocuments();
+    console.log(totalCount);
+
+    await NFT.find({})
+      .select({
+        nTitle: 1,
+        nCollection: 1,
+        nHash: 1,
+        nLazyMintingStatus: 1,
+        nNftImage: 1,
+        nDescription: 1,
+        nQuantity: 1,
+        nNftImage: 1,
+        nCreated: 1,
+      })
+      .populate({
+        path: 'nOrders',
+        options: {
+          limit: 1,
+        },
+        select: {
+          oPrice: 1,
+          oType: 1,
+          oValidUpto: 1,
+          auction_end_date: 1,
+          oStatus: 1,
+          _id: 0,
+        },
+      })
+      .populate({
+        path: 'nCreater',
+        options: {
+          limit: 1,
+        },
+        select: {
+          _id: 0,
+        },
+      })
+      .limit(limit)
+      .skip(req.body.startIndex)
+      .exec()
+      .then((res) => {
+        data.push(res);
+      })
+      .catch((e) => {
+        console.log('Error', e);
+      });
+
+    const results = {};
+    if (endIndex < totalCount) {
+      results.next = {
+        page: page + 1,
+        limit: limit,
+      };
+    }
+    if (startIndex > 0) {
+      results.previous = {
+        page: page - 1,
+        limit: limit,
+      };
+    }
+
+    results.count = totalCount;
+    results.results = data;
+
+    return res.send({ message: 'NFT List', results });
+  } catch (error) {
+    return res.send(error);
+  }
+};
 
 export {
   create,
@@ -1605,4 +1684,5 @@ export {
   getSearchedNft,
   transferNfts,
   getUserOnSaleNfts,
+  viewAdminNfts,
 };

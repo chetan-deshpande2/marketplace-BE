@@ -85,6 +85,7 @@ const updateProfile = async (req, res) => {
     let oProfileDetails = {};
 
     upload2.single('userProfile')(req, res, async (error) => {
+      
       const token =
         'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJkaWQ6ZXRocjoweDlCMzlDMDMxQUQ2OTg0Mzk4RTQ1NzQ0YTk2YzNkMzc0ZDU0YURENTAiLCJpc3MiOiJ3ZWIzLXN0b3JhZ2UiLCJpYXQiOjE2Njk3MzAwNDk1NTYsIm5hbWUiOiJtYXJrZXRwbGFjZSJ9.io0FvRpm6l-nbxxRGDMZii4s03ErdxJbGaC3yEHXzFM';
 
@@ -211,16 +212,14 @@ const getAllUserDetails = async (req, res) => {
             },
           ],
         })
-        .sort({ sCreated: -1 })
         .select({
-          swalletAddress: 1,
+          sWalletAddress: 1,
+          sRole: 1,
           username: 1,
           email: 1,
           Name: 1,
-          srole: 1,
           sCreated: 1,
           sStatus: 1,
-          sHash: 1,
           bio: 1,
           Website: 1,
           profileIcon: 1,
@@ -244,11 +243,11 @@ const getAllUserDetails = async (req, res) => {
       await User.find(UserSearchObj)
         .sort({ sCreated: -1 })
         .select({
-          swalletAddress: 1,
+          sWalletAddress: 1,
           username: 1,
           email: 1,
           Name: 1,
-          srole: 1,
+          sRole: 1,
           sCreated: 1,
           sStatus: 1,
           sHash: 1,

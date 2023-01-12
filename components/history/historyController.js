@@ -102,4 +102,26 @@ const fetchHistory = async (req, res) => {
   }
 };
 
-export { insertHistory, fetchHistory };
+const fetchListedNFTs = async (req, res) => {
+  try {
+    const data = [];
+    const results = {};
+    let totalCount = 0;
+
+    totalCount = await History.countDocuments({ actionMeta: 'Listed' });
+    await History.find({ actionMeta: 'Listed' })
+      .then((res) => {
+        data.push(res);
+      })
+      .catch((error) => {
+        return res.send(error);
+      });
+    results.count = totalCount;
+    results.results = data;
+    return res.send(results);
+  } catch (error) {
+    return res.send(error);
+  }
+};
+
+export { insertHistory, fetchHistory, fetchListedNFTs };

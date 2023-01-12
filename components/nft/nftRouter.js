@@ -18,7 +18,7 @@ import {
   transferNfts,
   getSearchedNft,
   updateNFTDeatils,
-  getHotCollection,
+  getHotCollection,viewAdminNfts
 } from './nftController.js';
 import {
   verifyToken,
@@ -49,6 +49,7 @@ router.put('/toggleSellingType', verifyToken, toggleSellingType);
 router.post('/uploadImage', verifyToken, uploadImage);
 
 router.post('/getAllNfts', getAllNFTs);
+router.post('/getAdminNfts',viewAdminNfts)
 router.post('/getOwnedNFTList', getOwnedNFTList);
 
 router.post('/getUserOnSaleNfts', getUserOnSaleNfts);
